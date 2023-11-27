@@ -1,0 +1,494 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.aboutus-description {
+    font-family: Arial, sans-serif; /* Default font if no specific font is selected */
+}
+
+.aboutus-description.Arial {
+    font-family: Arial, sans-serif;
+}
+
+.aboutus-description.Georgia {
+    font-family: Georgia, serif;
+}
+
+.aboutus-description.Verdana {
+    font-family: Verdana, sans-serif;
+}
+
+.wrapper{
+   
+    padding: 1%;
+    width: 80%;
+    margin: 0 auto;
+}
+.text-center{
+    text-align: center;
+}
+.clearfix{
+    float: none;
+    clear: both;
+}
+
+/* CSS for table */
+
+.tbl-full {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.tbl-full th, .tbl-full td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.tbl-full th {
+    background-color: #f2f2f2;
+}
+
+
+.tbl-30{
+    width: 30%;
+}
+
+table tr th{
+    border-bottom: 1px solid black;
+    padding: 1%;
+    text-align: left;
+}
+
+table tr td{
+    padding: 1%;
+}
+
+
+/* CSS for button */
+
+.btn-primary, .btn-secondary, .btn-third {
+    padding: 8px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.btn-primary{
+    background-color: #45aaf2;
+    padding: 1%;
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-primary:hover{
+    background-color: #2d98da;
+}
+
+.btn-secondary{
+    background-color: #26de81;
+    padding: 1%;
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-secondary:hover{
+    background-color: #20bf6b;
+}
+
+.btn-third{
+    background-color: #fc5c65;
+    padding: 1%;
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.btn-third:hover{
+    background-color: #eb3b5a;
+}
+
+/*CSS for notifs*/
+
+.success{
+    color: #26de81 ;
+}
+
+.error{
+    color: red;
+}
+
+
+/* CSS for menu */
+
+.menu {
+    border-bottom: 1px solid grey;
+    background-color: black;
+    left: -250px;
+}
+
+.menu.open {
+    right: 30px; /* Move the menu back on-screen when the 'open' class is applied */
+}
+
+.menu ul li a:hover {
+    color: orange;
+}
+
+.text-center .menu {
+    text-align: left;
+}
+
+.text-center #sidebarCollapse {
+    text-align: left;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown:hover .sub-menu {
+    display: block;
+    position: absolute; /* Add this to position the sub-menu properly */
+    top: 100%; /* Position the sub-menu below the parent */
+    left: 0; /* Align the sub-menu with the left edge of the parent */
+    background-color: #111 !important;
+    min-width: 150px;
+    z-index: 1;
+}
+.sub-menu {
+    display: none;
+}
+
+.sub-menu li {
+    padding: 0px 0;
+}
+
+.dropdown a {
+    text-decoration: none;
+    color: #fff !important;
+    display: block;
+    background-color: #111;
+}
+
+.dropdown a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+}
+
+.dropdown:hover a {
+    color: #111;
+}
+
+.dropdown:hover .sub-menu {
+    display: block;
+}
+.rotate {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease; /* Add a smooth transition effect */
+}
+.sidebar ul li ul li a {
+    cursor: pointer; /* Set the cursor to pointer (finger) */
+    /* Add other styles as needed for your design */
+}
+
+/* CSS for main content */
+.main-content{
+    background-color: #f1f2f6;
+    padding: 3% 0 ;
+}
+
+.col-4{
+    width: 18%;
+    background-color: white;
+    margin: 1%;
+    padding: 2%;
+    float: left;
+    
+
+}
+
+
+/* CSS for footer */
+
+
+
+
+.footer{
+    color: white;
+    background-color: black;
+  
+
+
+
+    
+    
+}
+
+
+
+/* CSS for login */
+.login {
+    background-color: black;
+    color: white;
+    width: 30%;
+    margin: 10% auto;
+    padding: 2%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    
+}
+
+.login h1 {
+    text-align: center;
+}
+
+.login form {
+    text-align: center;
+    
+}
+
+.login input[type="text"],
+.login input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+.login .btn-primary {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 50px; /* Make the sides circular */
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 100%; /* Make the button square shape */
+}
+
+.login .btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.login p.text-center {
+    text-align: center;
+}
+
+.login a {
+    color: red;
+}
+
+form {
+    background-color: #ffffff;
+    padding: 2%;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+form table {
+    width: 100%;
+}
+
+form table tr td {
+    padding: 10px;
+}
+
+/* CSS for input fields */
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* CSS for the "Add Admin" button */
+input[type="submit"].btn-secondary {
+    background-color: #26de81;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 20px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease-in-out;
+}
+
+input[type="submit"].btn-secondary:hover {
+    background-color: #20bf6b;
+}
+
+/*table in product */
+
+.tbl-full td:nth-child(4) {
+    width: 400px; /* Adjust the width as needed */
+}
+
+/* Add custom CSS for the sidebar */
+.sidebar {
+    width: 250px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    background-color: #111; /* Black background color */
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    font-family: Arial, sans-serif; /* Improved font */
+    color: white; /* Text color */
+    
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+.sidebar-title {
+    font-size: 1.8rem; /* Larger title font size */
+    padding: 10px 0;
+    text-align: center;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+}
+.sidebar ul li {
+    margin-bottom: 10px;
+    padding-left: 10px; /* Adjust this value for the desired indentation */
+}
+
+.sidebar ul li a {
+    padding: 5px 0; /* Adjust the top and bottom padding as needed */
+}
+
+.sidebar a {
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Add color transition */
+    color: white;
+}
+
+.sidebar ul li div.icon-link:hover .link_name {
+    color: #f39c12; /* Change the text color to orange on hover */
+}
+
+.sidebar a:hover {
+    background-color: #f39c12; /* Orange hover color */
+    color: black; /* Change text color on hover */
+}
+
+.content {
+    margin-left: 0; /* Change this to 0 to fill the space when sidebar is open */
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    transition: margin-left 0.3s ease; /* Add transition */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.logout-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    /* Adjust the positioning as needed */
+}
+
+
+.logout-btn {
+    background-color: #f39c12; /* Orange logout button color */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    
+}
+
+.logout-btn:hover {
+    background-color: #e67e22; /* Slightly darker orange on hover */
+}
+
+/* Style adjustments for sidebar links on hover */
+.sidebar a:hover {
+    background-color: #f39c12;
+    color: black;
+    padding-left: 15px;
+    transition: background-color 0.3s ease, color 0.3s ease, padding-left 0.3s ease;
+}
+
+
+
+#sidebarCollapse {
+    /* Button styles */
+   
+    top: 0px;
+    left: 260px; /* Adjust this value to your preference */
+    z-index: 999;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: white;
+    left: 250px;
+    position: absolute;
+
+    /* Other styles */
+}
+
+/* Optional: Style to change the color of the SVG icon when hovered */
+#sidebarCollapse:hover .svg-icon path {
+    fill: #f39c12; /* Change this to the desired color */
+}
+
+
+
+.status-label.pending {
+    background-color: #ffcc00; /* Yellow */
+    color: #333; /* Text color */
+}
+
+.status-label.packed {
+    background-color: #ff6600; /* Orange */
+    color: #fff; /* Text color */
+}
+
+.status-label.for-delivery {
+    background-color: #3399ff; /* Blue */
+    color: #fff; /* Text color */
+}
+
+.status-label.cancelled {
+    background-color: #ff3333; /* Red */
+    color: #fff; /* Text color */
+}
+
+.status-label.delivered {
+    background-color: #00cc66; /* Green */
+    color: #fff; /* Text color */
+}
+
+.status-label.on-the-way {
+    background-color: purple; /* Custom color for "On the Way" */
+    color: #fff; /* Text color */
+}
+
+/* Add similar classes for other status labels */
+

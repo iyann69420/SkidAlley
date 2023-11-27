@@ -1,0 +1,95 @@
+[06-Nov-2023 14:51:33 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_2` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:28
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(28): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 28
+[06-Nov-2023 14:52:48 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_2` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 14:55:14 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_2` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 14:55:15 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_2` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 14:56:02 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_2` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 14:56:09 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_2` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 14:56:44 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_2` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 15:00:14 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 15:00:15 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 15:00:22 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 15:01:32 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 15:01:39 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:31
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(31): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 31
+[06-Nov-2023 15:06:53 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:32
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(32): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 32
+[06-Nov-2023 15:06:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:32
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(32): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 32
+[06-Nov-2023 15:06:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:32
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(32): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 32
+[06-Nov-2023 15:06:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:32
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(32): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 32
+[06-Nov-2023 15:06:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:32
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(32): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 32
+[06-Nov-2023 15:06:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:32
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(32): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 32
+[06-Nov-2023 15:06:55 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Cannot add or update a child row: a foreign key constraint fails (`skidalley_db`.`admin_notifications`, CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`order_product_id`) REFERENCES `order_products` (`id`)) in C:\xampp\htdocs\SkidAlley\request-cancellation.php:32
+Stack trace:
+#0 C:\xampp\htdocs\SkidAlley\request-cancellation.php(32): mysqli_stmt_execute(Object(mysqli_stmt))
+#1 {main}
+  thrown in C:\xampp\htdocs\SkidAlley\request-cancellation.php on line 32
