@@ -26,12 +26,11 @@
                 $deliveryAddress = $row['delivery_address'];
                 $paymentMethod = $row['payment_method'];
                 $status = $row['status'];
+                $order_receive = $row['order_receive'];
             } else {
                 header('location:' . SITEURL . 'admin/orders.php');
             }
         }
-
-       
         ?>
 
         <br/><br/><br/>
@@ -50,7 +49,7 @@
 
                 <tr>
                     <td>Total Amount: </td>
-                    <td><?php echo $total_amount; ?></td>
+                    <td>₱<?php echo number_format($total_amount); ?></td>
                 </tr>
 
                 <tr>
@@ -61,7 +60,7 @@
                 <tr>
                     <td>Status: </td>
                     <td>
-                        <select name="status">
+                        <select name="status" <?php echo ($order_receive == 1) ? 'disabled' : ''; ?>>
                             <option value="0" <?php if ($status == 0) echo 'selected'; ?>>Pending</option>
                             <option value="1" <?php if ($status == 1) echo 'selected'; ?>>Packed</option>
                             <option value="2" <?php if ($status == 2) echo 'selected'; ?>>For Delivery</option>
@@ -72,12 +71,10 @@
                     </td>
                 </tr>
 
-                
             </table>
 
-
             <table class="tbl-30">
-            <?php
+                <?php
                 $sql2 = "SELECT op.order_id, 
                     p.name AS product_name, 
                     p.price AS product_price, 
@@ -90,98 +87,118 @@
                     WHERE op.order_id = $id";
                 $res2 = mysqli_query($conn, $sql2);
                 while ($productRow = mysqli_fetch_assoc($res2)) {
-                $product_name = $productRow['product_name'];
-                $product_color = $productRow['product_color'];
-                $product_size = $productRow['product_size'];
-                $product_quantity = $productRow['product_quantity'];
-                $product_image = $productRow['product_image'];
-                ?>
-                <tr>
-                    <td>Product : </td>
-                    <td>
-                        <img src="<?php echo SITEURL; ?>images/bike/<?php echo $product_image; ?>" width="100px" alt="<?php echo $product_name; ?>"><br>
-                        <?php echo $product_name; ?>
-                    </td>
-                </tr>
+                    $product_name = $productRow['product_name'];
+                    $product_color = $productRow['product_color'];
+                    $product_size = $productRow['product_size'];
+                    $product_quantity = $productRow['product_quantity'];
+                    $product_image = $productRow['product_image'];
+                    ?>
+                    <tr>
+                        <td>Product : </td>
+                        <td>
+                            <img src="<?php echo SITEURL; ?>images/bike/<?php echo $product_image; ?>" width="100px"
+                                 alt="<?php echo $product_name; ?>"><br>
+                            <?php echo $product_name; ?>
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td>Color and Size: </td>
-                    <td><?php echo $product_color . ', ' . $product_size; ?></td>
-                </tr>
+                    <tr>
+                        <td>Color and Size: </td>
+                        <td><?php echo $product_color . ', ' . $product_size; ?></td>
+                    </tr>
 
-                <tr>
-                    <td>Quantity: </td>
-                    <td><?php echo $product_quantity; ?></td>
-                </tr>
-                <?php
+                    <tr>
+                        <td>Quantity: </td>
+                        <td><?php echo $product_quantity; ?></td>
+                    </tr>
+                    <?php
                 }
-                // End the while loop here
-                ?>          
+                ?>
             </table>
 
             <input type="submit" name="submit" value="Update Status" class="btn-secondary">
-        
+
         </form>
-
-
 
         <?php
         // Check if the form is submitted
-            if (isset($_POST['submit'])) {
-                $newStatus = $_POST['status'];
-                
-                // Update the status in the database
-                $updateSql = "UPDATE order_list SET status = $newStatus WHERE id = $id";
-                $updateRes = mysqli_query($conn, $updateSql);
+        if (isset($_POST['submit'])) {
+            $newStatus = $_POST['status'];
 
-                if ($updateRes) {
-                    $_SESSION['add'] = "Status updated successfully.";
+            // Update the status in the database
+            $updateSql = "UPDATE order_list SET status = $newStatus WHERE id = $id";
+            $updateRes = mysqli_query($conn, $updateSql);
 
-                    // If the new status is 'Cancelled' (status code 5)
-                    if ($newStatus == 5) {
-                        // Get the products from the canceled order
-                        $getProductsSql = "SELECT * FROM order_products WHERE order_id = $id";
-                        $productsResult = mysqli_query($conn, $getProductsSql);
+            if ($updateRes) {
+                $_SESSION['add'] = "Status updated successfully.";
 
-                        while ($product = mysqli_fetch_assoc($productsResult)) {
-                            $productId = $product['product_id'];
-                            $productQuantity = $product['quantity'];
+                // Notification messages based on the new status
+                $notificationData = [
+                    1 => ["type" => "Packed", "message" => "Your Order Is Packed and ready for delivery."],
+                    2 => ["type" => "For Delivery", "message" => "Your Order Is out for delivery."],
+                    3 => ["type" => "On the Way", "message" => "Your Order Is on the way."],
+                    4 => ["type" => "Delivered", "message" => "Your Order Has Been Delivered Successfully."]
+                ];
 
-                            // Update the quantity in the stock_list table
-                            $updateStockSql = "UPDATE stock_list SET quantity = quantity + $productQuantity WHERE product_id = $productId";
-                            mysqli_query($conn, $updateStockSql);
-                        }
+                if (isset($notificationData[$newStatus])) {
+                    $notificationType = $notificationData[$newStatus]["type"];
+                    $notificationMessage = $notificationData[$newStatus]["message"];
 
-                        $userId = isset($_SESSION['client_id']) ? $_SESSION['client_id'] : null;
+                    // Insert the notification into the database
+                    $userId = isset($_SESSION['client_id']) ? $_SESSION['client_id'] : null;
+                    $timestamp = date('Y-m-d H:i:s');
+                    $status = "new";
+                    $isRead = 0;
+                    $promoId = 0; // Replace this with the actual promo ID if applicable
 
-                        $notificationMessage = "Your order has been canceled successfully.";
-                        $notificationType = "Cancellation";
-                        $timestamp = date('Y-m-d H:i:s');
-                        $status = "new";
-                        $isRead = 0;
-                        $promoId = 0; // Replace this with the actual promo ID if applicable
-                        
-                        $insertNotificationSql = "INSERT INTO notifications (user_id, message, notification_type, timestamp, status, is_read, promo_id) 
-                                                VALUES ($userId, '$notificationMessage', '$notificationType', '$timestamp', '$status', $isRead, $promoId)";
-                        
-                        mysqli_query($conn, $insertNotificationSql);
-                        
-                        // Redirect to the desired page after canceling the order
-                        header('location: ' . SITEURL . 'admin/orders.php');
-                    } else {
-                        // Redirect to the desired page if the status is not 'Cancelled'
-                        header('location: ' . SITEURL . 'admin/orders.php');
+                    $insertNotificationSql = "INSERT INTO notifications (user_id, message, notification_type, timestamp, status, is_read, promo_id) 
+                                              VALUES ($userId, '$notificationMessage', '$notificationType', '$timestamp', '$status', $isRead, $promoId)";
+
+                    mysqli_query($conn, $insertNotificationSql);
+                }
+
+                // If the new status is 'Cancelled' (status code 5)
+                if ($newStatus == 5) {
+                    // Get the products from the canceled order
+                    $getProductsSql = "SELECT * FROM order_products WHERE order_id = $id";
+                    $productsResult = mysqli_query($conn, $getProductsSql);
+
+                    while ($product = mysqli_fetch_assoc($productsResult)) {
+                        $productId = $product['product_id'];
+                        $productQuantity = $product['quantity'];
+
+                        // Update the quantity in the stock_list table
+                        $updateStockSql = "UPDATE stock_list SET quantity = quantity + $productQuantity WHERE product_id = $productId";
+                        mysqli_query($conn, $updateStockSql);
                     }
+
+                    $userId = isset($_SESSION['client_id']) ? $_SESSION['client_id'] : null;
+
+                    $notificationMessage = "Your order has been canceled successfully.";
+                    $notificationType = "Cancellation";
+                    $timestamp = date('Y-m-d H:i:s');
+                    $status = "new";
+                    $isRead = 0;
+                    $promoId = 0; // Replace this with the actual promo ID if applicable
+
+                    $insertNotificationSql = "INSERT INTO notifications (user_id, message, notification_type, timestamp, status, is_read, promo_id) 
+                                            VALUES ($userId, '$notificationMessage', '$notificationType', '$timestamp', '$status', $isRead, $promoId)";
+
+                    mysqli_query($conn, $insertNotificationSql);
+
+                    // Redirect to the desired page after canceling the order
+                    header('location: ' . SITEURL . 'admin/orders.php');
                 } else {
-                    $_SESSION['add'] = "Failed to update status.";
+                    // Redirect to the desired page if the status is not 'Cancelled'
                     header('location: ' . SITEURL . 'admin/orders.php');
                 }
+            } else {
+                $_SESSION['add'] = "Failed to update status.";
+                header('location: ' . SITEURL . 'admin/orders.php');
             }
-
+        }
         ?>
     </div>
 </div>
 
 <?php include('partials/footer.php'); ?>
-
-

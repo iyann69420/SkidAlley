@@ -3,14 +3,45 @@ include ('../config/constants.php');
 include ('login-check.php');
 
 
-
 ?>
 
+
+<style>
+    #notificationLink {
+        position: relative;
+        display: inline-block;
+        margin-right: -1000px; /* Adjust as needed */
+        margin-bottom: -5px;
+        margin-top: 10px;
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .notification-count {
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 20px;
+        font-size: 14px;
+    }
+    #notificationLink:hover {
+        color: darkorange;
+    }
+</style>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skid Alley Admin Dashboard</title>
     <link rel="stylesheet" href="../admin/css/admin.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-GLhlTQ8iZSL+poG6eA6q8QDH7g3uKEO/4F+sl5LU6I5LdQDO/1u2wnf50pdPw1x" crossorigin="anonymous">
+
 </head>
 <body>
     <div class="menu text-center">
@@ -21,8 +52,12 @@ include ('login-check.php');
                     <path d="M232.369231 282.813046h559.261538a31.507692 31.507692 0 0 0 0-63.015384h-559.261538a31.507692 31.507692 0 0 0 0 63.015384zM791.630769 480.492308h-559.261538a31.507692 31.507692 0 0 0 0 63.015384h559.261538a31.507692 31.507692 0 0 0 0-63.015384zM791.630769 741.186954h-559.261538a31.507692 31.507692 0 0 0 0 63.015384h559.261538a31.507692 31.507692 0 0 0 0-63.015384z" />
                 </svg>
             </button>
+
+            <a href="notifications-admin.php" id="notificationLink" class="notifications">
+                Notifications
+                <span id="notificationCount" class="notification-count"></span>
+            </a>
                 
-               
                
             
         </div>
@@ -30,7 +65,9 @@ include ('login-check.php');
 
     <div class="sidebar" id="sidebar">
     <br>
-    <div class="sidebar-title">Skid Alley Admin Dashboard</div>
+    <a href="index.php"> <!-- Add this line to make the title clickable -->
+            <div class="sidebar-title">Skid Alley Admin Dashboard</div>
+        </a>
     <div class="wrapper">
         <ul>
             <br>
@@ -77,12 +114,7 @@ include ('login-check.php');
             <li><a href="orders.php">Orders</a></li>
             <?php } ?>
 
-            <li>
-                    <a href="notifications-admin.php">
-                  
-                        Notifications
-                    </a>
-                </li>
+         
             
             <?php if ($admin) { ?>
             <li><a href="admin.php">Admin</a></li>
@@ -107,13 +139,19 @@ include ('login-check.php');
 
 
     <script>
-        // Toggle sidebar visibility
-        document.getElementById('sidebarCollapse').addEventListener('click', function () {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
 
-        });
-        function toggleSubMenu(element) {
+document.addEventListener('DOMContentLoaded', function () {
+    // Toggle sidebar
+    document.getElementById('sidebarCollapse').addEventListener('click', function () {
+        const sidebar = document.getElementById('sidebar');
+        sidebar.classList.toggle('active');
+    });
+
+    // Update notification count
+    updateNotificationCount();
+});
+
+function toggleSubMenu(element) {
             const subMenu = element.nextElementSibling;
             const arrow = element.querySelector(".arrow");
 
@@ -125,9 +163,38 @@ include ('login-check.php');
                 arrow.classList.add('rotate');
             }
         }
-     
+
+function updateNotificationCount() {
+    // Make an AJAX call to fetch the notification count from the server
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            // Get the notification count from the response
+            var count = parseInt(this.responseText);
+
+            // Get the notification count element
+            var notificationCountElement = document.getElementById('notificationCount');
+
+            // Update the notification count in the HTML
+            notificationCountElement.textContent = count;
+
+            // Hide the notification count if the count is zero
+            if (count === 0) {
+                notificationCountElement.style.display = 'none';
+            } else {
+                notificationCountElement.style.display = 'block';
+            }
+        }
+    };
+    xhr.open("GET", "get-notification-count.php", true);
+    xhr.send();
+}
     </script>
 </body>
 </html>
 <?include ('login-check.php');
+?>
+<?php
+
+
 ?>

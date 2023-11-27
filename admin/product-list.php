@@ -33,6 +33,7 @@
             echo $_SESSION['update'];
             unset($_SESSION['update']);
         }
+        
         ?>
         <br><br>
         <a href="<?php echo SITEURL; ?>admin/add-product-list.php" class="btn-primary">Add Product</a>
@@ -96,7 +97,7 @@
                     <tr>
                         <td><?php echo $sn++; ?></td>
                         <td><?php echo $title; ?></td>
-                        <td><?php echo $price; ?></td>
+                        <td>₱<?php echo number_format($price); ?></td>
                         <td><?php echo $description; ?></td>
                         <td>
                             <?php

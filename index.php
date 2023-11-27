@@ -105,30 +105,18 @@
         <div class="bikelist-container clearfix" id="product-list">
         <br><br><br><br>
         <h1> Featured Bikes</h1>
-        <?php
-        if(isset($_SESSION['add']))
-        {
-            echo $_SESSION['add'];
-            unset($_SESSION['add']);
-        }
-
-        if(isset($_SESSION['login']))
-        {
-          echo $_SESSION['login'];
-          unset($_SESSION['login']);
-        }
-        
-        ?>
 
         <br><br>
 
         <?php
 
-        $sql = "SELECT pl.*, MAX(sl.quantity) AS stock_quantity 
+        $sql = "SELECT pl.*, MAX(sl.quantity) AS stock_quantity, d.discount_percentage
         FROM product_list pl 
         LEFT JOIN stock_list sl ON pl.id = sl.product_id 
+        LEFT JOIN discounts d ON pl.id = d.product_id AND NOW() BETWEEN d.start_time AND d.end_time
         WHERE pl.status = '1'
-        GROUP BY pl.id, pl.name, pl.description, pl.image_path, pl.price";
+        GROUP BY pl.id, pl.name, pl.description, pl.image_path, pl.price, d.discount_percentage";
+
         $res = mysqli_query($conn, $sql);
 
         $count = mysqli_num_rows($res);
@@ -137,12 +125,16 @@
         {
             while($row=mysqli_fetch_assoc($res))
             {
-                $id = $row['id'];
+                 $id = $row['id'];
                 $title = $row['name'];
                 $description = $row['description'];
                 $image_name = $row['image_path'];
                 $price = $row['price'];
                 $stock = $row['stock_quantity'];
+                $discountPercentage = $row['discount_percentage'];
+
+                // Calculate discounted price
+                $discountedPrice = $price - ($price * $discountPercentage / 100);
                 
                 ?> 
 
@@ -169,7 +161,14 @@
                                 <h2> Product Name: <?php echo $title; ?> </h2>
                               
                               
-                                <p> Price:  ₱<?php echo $price; ?></p>
+                                <?php
+                              if (!empty($discountPercentage) && $discountPercentage > 0) {
+                                echo "<p class='price'>Price: ₱<span class='original-price'>" . number_format($price) . "</span></p>";
+                                echo "<p class='discounted-price'>Discounted Price: ₱" . number_format($discountedPrice) . "</p>";
+                            } else {
+                                echo "<p class='price'>Price: ₱" . number_format($price) . "</p>";
+                            }
+                                ?>
                             </div> 
                         
                         </div>
@@ -198,5 +197,5 @@
 </body>
 
 </html>
-
+<br><br><br><br>
 <?php include('partials-front/footer.php'); ?>

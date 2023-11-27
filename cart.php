@@ -34,10 +34,12 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
         </tr>
 
         <?php
-        $sql = "SELECT c.id AS cart_id, c.product_id, c.quantity, c.color, c.size, p.name, p.price, p.image_path
-           FROM cart_list c
-           INNER JOIN product_list p ON c.product_id = p.id
-           WHERE c.client_id = $client_id";
+        $sql = "SELECT c.id AS cart_id, c.product_id, c.quantity, c.color, c.size, p.name, p.price, p.image_path, d.discount_percentage
+        FROM cart_list c
+        INNER JOIN product_list p ON c.product_id = p.id
+        LEFT JOIN discounts d ON c.product_id = d.product_id AND NOW() BETWEEN d.start_time AND d.end_time
+
+        WHERE c.client_id = $client_id";
         $res = mysqli_query($conn, $sql);
         $count = mysqli_num_rows($res);
         $sn = 1;
@@ -63,6 +65,13 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
                 $stock_row = mysqli_fetch_assoc($stock_result);
                 $available_stock = $stock_row['quantity'];
 
+                $discount_percentage = $row['discount_percentage'];
+
+                // Apply discount based on fetched discount percentage
+               $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
+                $product_total = $discounted_price * $product_quantity; // Updated calculation with discount
+                $product_price = $discounted_price;
+
                 
 
                 // Add data-available-stock attribute to plus and minus buttons
@@ -83,7 +92,7 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
                     </td>
 
                     <td><?php echo $product_name; ?></td>
-                    <td>PHP<?php echo $product_price; ?></td>
+                    <td>PHP<?php echo number_format($product_price); ?></td>
 
                     <td><?php echo $row['color']; ?></td>
                     <td><?php echo $row['size']; ?></td>
@@ -122,7 +131,7 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
         ?>
         <tr>
             <td colspan="7" style="text-align: right">Total Price:</td>
-            <td class="total-price">₱<?php echo $totalPrice; ?></td>
+            <td class="total-price">₱<?php echo number_format($totalPrice); ?></td>
             <td></td>
         </tr>
     </table>
@@ -234,27 +243,40 @@ $(document).ready(function () {
         updateQuantity($(this).siblings('.plus-btn').data('cart-id'), $(this).val()); 
     });
     function updateTotal(input) {
-        var quantity = parseInt($(input).val());
-        var unitPrice = parseFloat($(input).data('product-price'));
-        var totalCell = $(input).closest('tr').find('.product-total');
-        var newTotal = unitPrice * quantity;
+    var quantity = parseInt($(input).val());
+    var unitPrice = parseFloat($(input).data('product-price'));
+    var totalCell = $(input).closest('tr').find('.product-total');
+    var newTotal = unitPrice * quantity;
 
-        if (!isNaN(newTotal)) {
-            totalCell.text('PHP' + newTotal.toFixed(2));
-            updateGrandTotal();
-        }
-    }
-
-    function updateGrandTotal() {
-        var grandTotal = 0;
-        $('.product-total').each(function () {
-            var productTotal = parseFloat($(this).text().replace('PHP', ''));
-            if (!isNaN(productTotal)) {
-                grandTotal += productTotal;
-            }
+    if (!isNaN(newTotal)) {
+        // Format the newTotal to include commas for thousands and display currency symbol
+        var formattedTotal = newTotal.toLocaleString('en-PH', {
+            style: 'currency',
+            currency: 'PHP'
         });
-        $('.total-price').text('PHP' + grandTotal.toFixed(2));
+
+        totalCell.text(formattedTotal);
+        updateGrandTotal();
     }
+}
+
+function updateGrandTotal() {
+    var grandTotal = 0;
+    $('.product-total').each(function () {
+        var productTotal = parseFloat($(this).text().replace(/[^\d.-]/g, ''));
+        if (!isNaN(productTotal)) {
+            grandTotal += productTotal;
+        }
+    });
+
+    // Format the grandTotal to include commas for thousands and display currency symbol
+    var formattedGrandTotal = grandTotal.toLocaleString('en-PH', {
+        style: 'currency',
+        currency: 'PHP'
+    });
+
+    $('.total-price').text(formattedGrandTotal);
+}
 
     // Initial update of grand total
     updateGrandTotal();
@@ -291,5 +313,5 @@ var deleteMessage = localStorage.getItem('deleteMessage');
 
 
 </script>
-
+<br><br><br><br><br><br><br><br><br><br><br>
 <?php include('partials-front/footer.php'); ?>

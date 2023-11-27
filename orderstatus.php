@@ -4,8 +4,15 @@
         if (!isset($_SESSION['userLoggedIn'])) {
             header("Location: login.php");
             exit();
+            
         }
-
+        if (isset($_SESSION['reviewSubmitted']) && $_SESSION['reviewSubmitted']) {
+            echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js'></script>";
+            echo "<script>alertify.success('Review submitted successfully!');</script>";
+        
+            // Reset the session variable to avoid showing the message again on page refresh
+            $_SESSION['reviewSubmitted'] = false;
+        }
    
 
         ?>
@@ -37,6 +44,8 @@
             <button onclick="filterOrders('On the Way')">On the Way</button>
             <button onclick="filterOrders('Delivered')">Delivered</button>
             <button onclick="filterOrders('Cancelled')">Cancelled</button>
+         
+            
         </div>
         <br>
         <?php
@@ -67,6 +76,7 @@
                         3 => 'On the Way',
                         4 => 'Delivered',
                         5 => 'Cancelled',
+                        
                     ];
                     
                     // Get the corresponding text for the status
@@ -83,18 +93,50 @@
                                     <h6>Order ID: <?php echo $ref_code ?></h6>
                                     <article class="card">
                                         <div class="card-body row">
-                                            <div class="col">
-                                                <strong>Estimated Delivery time:</strong> <br>
-                                                <?php
-                                                // Assuming $deliveryAddress is a valid date in a format like "YYYY-MM-DD"
-                                                $deliveryDate = date('Y-m-d', strtotime($deliveryAddress . ' +10 days'));
-                                                echo $date_ordered;
-                                                ?>
-                                            </div>
+                                        <div class="col">
+                                        <strong>Estimated Delivery time:</strong> <br>
+                                        <?php
+                                        // Assuming $date_ordered is a valid date in a format like "YYYY-MM-DD"
+                                        $deliveryDate = '';
+
+                                        switch ($statusTextValue) {
+                                            case 'Pending':
+                                                $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
+                                                break;
+
+                                            case 'Packed':
+                                                $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
+                                                break;
+
+                                            case 'For Delivery':
+                                                $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
+                                                break;
+
+                                            case 'On the Way':
+                                                $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +3 days'));
+                                                break;
+
+                                            case 'Delivered':
+                                                // Customize as needed for the Delivered status
+                                                $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
+                                                break;
+
+                                            case 'Cancelled':
+                                                // Customize as needed for the Cancelled status
+                                                $deliveryDate = 'N/A'; // or any other message for cancelled orders
+                                                break;
+
+                                            default:
+                                                $deliveryDate = 'Unknown';
+                                                break;
+                                        }
+
+                                        echo $deliveryDate;
+                                        ?>
+                                    </div>
                                             <div class="col"> <strong>Shipping BY:</strong> <br> Skid Alley, | <i class="fa fa-phone"></i> +1598675986 </div>
                                             <div class="col status"> <strong>Status:</strong> <br><?php echo $statusTextValue ?> </div>
-                                            <div class="col"> <strong>Total Ammount: </strong> <br>₱<?php echo $total_amount ?> </div>
-                                        </div>
+                                            <div class="col"> <strong>Total Amount:</strong> <br>₱<?php echo number_format($total_amount); ?> </div>
                                     </article>
 
 
@@ -135,15 +177,19 @@
                                 $order_id = $row['id']; // Assuming you have an 'order_id' column in your 'order_list' table
 
                                 $query = "SELECT op.order_id, 
-                                p.name AS product_name, 
-                                p.price AS product_price, 
-                                p.image_path AS product_image,
-                                op.color AS product_color,
-                                op.size AS product_size,
-                                op.quantity AS product_quantity
+                                        p.name AS product_name, 
+                                        p.price AS product_price, 
+                                        d.discount_percentage AS product_discount,  
+                                        p.image_path AS product_image,
+                                        op.color AS product_color,
+                                        op.size AS product_size,
+                                        op.quantity AS product_quantity
                                 FROM order_products op
                                 JOIN product_list p ON op.product_id = p.id
+                                LEFT JOIN discounts d ON p.id = d.product_id  
                                 WHERE op.order_id = $order_id";
+
+
                                 // Use a different variable for the result set of the inner query
                                 $resInner = mysqli_query($conn, $query);
 
@@ -155,6 +201,12 @@
                                     $product_color = $productRow['product_color'];
                                     $product_size = $productRow['product_size'];
                                     $product_quantity = $productRow['product_quantity'];
+
+                                    $discounted_price = null;
+                                    if (!empty($product_discount)) {
+                                        $discounted_price = $product_price - ($product_price * $product_discount / 100);
+                                        $discounted_price = number_format($discounted_price, 2); // Format to 2 decimal places
+                                    }
                                 
                                     ?>
                                     <li class="col-md-4">
@@ -178,7 +230,9 @@
                                             <br>
                                             <span class="text-muted">Quantity: <?php echo $product_quantity; ?></span>
                                             <br>
-                                            <span class="text-muted">₱<?php echo $product_price; ?></span>
+                                          
+                                                
+                                                
                                         
                                         </figcaption>
                                         </figure>
@@ -216,9 +270,24 @@
                                         } else {
                                             echo $formButton;
                                         }
-                                    } elseif ($statusTextValue === 'Delivered') {
-                                        $formButton = "<button type=\"button\" onclick=\"redirectToReviewPage($order_id)\" class=\"btn btn-success\" data-abc=\"true\">Review Product</button>";
-                                        echo $formButton;
+                                    } 
+
+                                    if ($statusTextValue === 'Delivered') {
+                                        if ($row['order_receive'] == 0) {
+                                            // If the order has not been received
+                                            echo "<button type=\"button\" onclick=\"confirmOrderReceived($order_id)\" class=\"btn btn-primary\" data-abc=\"true\">Order Received</button>";
+                                        } else {
+                                            // If the order has been received, check if there is a review for this order
+                                            $checkReviewSql = "SELECT * FROM reviews WHERE order_id = $order_id";
+                                            $reviewResult = mysqli_query($conn, $checkReviewSql);
+                                    
+                                            if (mysqli_num_rows($reviewResult) > 0) {
+                                                echo "<p>Product reviewed</p>";
+                                            } else {
+                                                // If there is no review, change the button to review product
+                                                echo "<button type=\"button\" onclick=\"redirectToReviewPage($order_id)\" class=\"btn btn-success\" data-abc=\"true\">Review Product</button>";
+                                            }
+                                        }
                                     }
                                     ?>
                                 </div>
@@ -257,55 +326,96 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
 
         <script defer>
-            
-  function confirmCancelOrder(orderId) {
-    alertify.prompt('Please provide a reason for cancellation', '', function (evt, value) { 
-        if (value.trim() === '') {
-            alertify.error('Please provide a reason for cancellation.');
-        } else {
-            let reasonInput = document.getElementById(`reasonInput_${orderId}`);
-            let cancelOrderForm = document.getElementById(`cancelOrderForm_${orderId}`);
-            if (reasonInput && cancelOrderForm) {
-                reasonInput.value = value;
-                cancelOrderForm.submit();
+    function confirmCancelOrder(orderId) {
+        alertify.prompt('Please provide a reason for cancellation', '', function (evt, value) {
+            if (value.trim() === '') {
+                alertify.error('Please provide a reason for cancellation.');
             } else {
-                alertify.error('An error occurred while processing your request.');
+                let reasonInput = document.getElementById(`reasonInput_${orderId}`);
+                let cancelOrderForm = document.getElementById(`cancelOrderForm_${orderId}`);
+                if (reasonInput && cancelOrderForm) {
+                    reasonInput.value = value;
+                    cancelOrderForm.submit();
+                } else {
+                    alertify.error('An error occurred while processing your request.');
+                }
             }
-        }
-    }, function () { 
-        // User clicked cancel for providing a reason
-    });
-}
-function redirectToReviewPage(orderId) {
-    // Assuming the review page is named 'review.php'
-    // You can replace this with the actual URL of your review page
-    let reviewPageURL = 'review.php?order_id=' + orderId;
-    window.location.href = reviewPageURL;
-}
-function filterOrders(status) {
-    let allOrders = document.querySelectorAll('.container');
-    let anyOrdersDisplayed = false; // Keep track if any orders were displayed
-
-    allOrders.forEach((currentOrder) => {
-        let orderStatus = currentOrder.dataset.status;
-
-        if (!status || status.toLowerCase() === 'all') {
-            currentOrder.style.display = 'block'; // Show all orders if status is empty or 'all'
-            anyOrdersDisplayed = true;
-        } else if (orderStatus === status.toLowerCase()) {
-            currentOrder.style.display = 'block'; // Show orders with the selected status
-            anyOrdersDisplayed = true;
-        } else {
-            currentOrder.style.display = 'none'; // Hide orders that don't match the selected status
-        }
-    });
-
-    if (!anyOrdersDisplayed && !noOrdersMessageShown) {
-        // If no orders were displayed and the message hasn't been shown yet, display the message
-        let messageContainer = document.createElement('div');
-        messageContainer.innerText = 'No orders to display for this status.';
-        document.body.appendChild(messageContainer); // Append the message to the body or a suitable container
-        noOrdersMessageShown = true; // Set the flag to true to indicate that the message has been shown
+        }, function () {
+            // User clicked cancel for providing a reason
+        });
     }
+
+    function redirectToReviewPage(orderId) {
+        // Assuming the review page is named 'review.php'
+        // You can replace this with the actual URL of your review page
+        let reviewPageURL = 'review.php?order_id=' + orderId;
+        window.location.href = reviewPageURL;
+    }
+
+    function confirmOrderReceived(orderId) {
+    // Display a confirmation dialog using Alertify.js
+    alertify.confirm('Confirm Order Received', 'Have you received your order?', 
+        function () {
+            // User clicked 'OK'
+            // Assuming you have a PHP script to handle the update, replace 'update-order-received.php' with the actual script
+            let updateURL = 'update-order-received.php?order_id=' + orderId;
+
+            // Use AJAX to send a request to the server
+            let xhr = new XMLHttpRequest();
+            xhr.open('GET', updateURL, true);
+
+            // Set up a callback function to handle the response
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    // Update the button text or perform any other action
+                    alertify.success('Order Received successfully updated.');
+                    // Optionally, you can reload the page or update the UI as needed
+                    location.reload();
+                } else {
+                    alertify.error('Error updating order status.');
+                }
+            };
+
+            // Set up a callback function to handle errors
+            xhr.onerror = function () {
+                alertify.error('An error occurred while processing your request.');
+            };
+
+            // Send the AJAX request
+            xhr.send();
+        },
+        function () {
+            // User clicked 'Cancel'
+            // Do nothing or provide any additional action if needed
+        }
+    );
 }
-</script>   
+
+
+    function filterOrders(status) {
+        let allOrders = document.querySelectorAll('.container');
+        let anyOrdersDisplayed = false; // Keep track if any orders were displayed
+
+        allOrders.forEach((currentOrder) => {
+            let orderStatus = currentOrder.dataset.status;
+
+            if (!status || status.toLowerCase() === 'all') {
+                currentOrder.style.display = 'block'; // Show all orders if status is empty or 'all'
+                anyOrdersDisplayed = true;
+            } else if (orderStatus === status.toLowerCase()) {
+                currentOrder.style.display = 'block'; // Show orders with the selected status
+                anyOrdersDisplayed = true;
+            } else {
+                currentOrder.style.display = 'none'; // Hide orders that don't match the selected status
+            }
+        });
+
+        if (!anyOrdersDisplayed && !noOrdersMessageShown) {
+            // If no orders were displayed and the message hasn't been shown yet, display the message
+            let messageContainer = document.createElement('div');
+            messageContainer.innerText = 'No orders to display for this status.';
+            document.body.appendChild(messageContainer); // Append the message to the body or a suitable container
+            noOrdersMessageShown = true; // Set the flag to true to indicate that the message has been shown
+        }
+    }
+</script>

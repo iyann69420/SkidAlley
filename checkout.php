@@ -18,6 +18,10 @@ $deliveryOption = '';
 <br><br><br><br><br><br><br><br>
 <body style="text-align: center"; >
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/themes/default.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
+
 <h1>Checkout</h1>
 <br>
 <form method="post">
@@ -57,6 +61,7 @@ $deliveryOption = '';
 
     <tr>
         <th>Product Order</th>
+        <th>Image</th>
         <th>Color and Size</th>
         <th>Unit Price</th>
         <th>Quantity</th>
@@ -65,10 +70,11 @@ $deliveryOption = '';
 
     <tr>
         <?php
-        $sql = "SELECT c.id, c.product_id, c.quantity, c.color, c.size, p.name, p.price, p.image_path
-        FROM cart_list c
-        INNER JOIN product_list p ON c.product_id = p.id
-        WHERE c.client_id = $userId";
+       $sql = "SELECT c.id, c.product_id, c.quantity, c.color, c.size, p.name, p.price, p.image_path, d.discount_percentage
+       FROM cart_list c
+       INNER JOIN product_list p ON c.product_id = p.id
+       LEFT JOIN discounts d ON c.product_id = d.product_id AND NOW() BETWEEN d.start_time AND d.end_time
+       WHERE c.client_id = $userId";
         $res = mysqli_query($conn, $sql);
         $count = mysqli_num_rows($res);
         $sn = 1;
@@ -85,25 +91,30 @@ $deliveryOption = '';
                 $product_color = $row['color'];
                 $product_size = $row['size'];
 
+
+                $discount_percentage = $row['discount_percentage'];
+
+                $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
+                $product_total = $discounted_price * $product_quantity; // Updated calculation with discount
+                $product_price_display = $discounted_price;
+
                 ?>
-                <tr>
-                    <td>
-                    <?php
+                 <tr>
+                    <td><?php echo $product_name; ?></td>
+                    <td><?php
                         if ($product_image == "") {
                             echo "<div class='error'>Image not Added.</div>";
                         } else {
                             ?>
                             <img src="<?php echo SITEURL; ?>images/bike/<?php echo $product_image; ?>"
-                                 width="50px">
+                                width="50px">
                             <?php
                         }
-                        ?>
-                        
-                    <?php echo $product_name; ?></td>
+                        ?></td>
                     <td><?php echo "Color: " . $product_color . "<br>Size: " . $product_size; ?></td>
-                    <td>₱<?php echo $product_price; ?></td>
+                    <td>₱<?php echo number_format($product_price_display); ?></td>
                     <td><?php echo $product_quantity; ?></td>
-                    <td>₱<?php echo $product_total; ?></td>
+                    <td>₱<?php echo number_format($product_total); ?></td>
                 </tr>
 
                 <?php
@@ -115,12 +126,11 @@ $deliveryOption = '';
     </tr>
 </table>
 
-<tr>
-    <td colspan="7" style="text-align: right">Total Price: ₱</td>
-    <td class="total-price"><?php echo $totalPrice; ?></td>
-</tr>
 
-
+<div class="order-message">
+    <label for="order_message">Message:</label>
+    <textarea name="order_message" id="order_message" rows="4" cols="50"></textarea>
+</div>
 
 <div class="payment-method">
     <h2>Payment Method</h2>
@@ -133,6 +143,9 @@ $deliveryOption = '';
         <!-- Remove the duplicate input element -->
     </div>
 </div>
+
+
+
 
 <!-- Keep this hidden input field for payment_method -->
 <input type="hidden" name="payment_method" value="">
@@ -152,6 +165,7 @@ $deliveryOption = '';
     };
 
     function showPaymentButtons() {
+        
         const paymentButtons = document.querySelector('.payment-buttons');
         paymentButtons.style.display = 'flex';
     }
@@ -165,27 +179,57 @@ $deliveryOption = '';
     const paymentDetails = document.querySelector('.payment-details');
     const paymentMethodInput = document.querySelector('input[name="payment_method"]');
     const deliveryAddressInput = document.querySelector('input[name="delivery_address"]');
+    const orderMessageTextarea = document.querySelector('textarea[name="order_message"]');
+    const additionalFee = 300; // Additional fee for Cash on Delivery
 
     if (paymentMethodInput) {
+        let totalWithFee = <?php echo $totalPrice; ?>; // Initial total without fee
+
+        if (paymentMethod === 'Cash on Delivery') {
+            const maxQuantityForCOD = 5;
+            let totalQuantity = 0;
+
+            // Calculate the total quantity in the cart
+            <?php
+            $cartItemsSql = "SELECT SUM(quantity) AS total_quantity FROM cart_list WHERE client_id = $userId";
+            $cartItemsResult = mysqli_query($conn, $cartItemsSql);
+            if ($cartItemsResult) {
+                $totalQuantity = mysqli_fetch_assoc($cartItemsResult)['total_quantity'];
+            }
+            ?>
+            totalQuantity = <?php echo $totalQuantity; ?>;
+
+            if (totalQuantity > maxQuantityForCOD) {
+                alertify.alert('Exceeded Cash on Delivery Quantity Limit', 'Cash on Delivery quantity is limited to 5 items. Please reduce the quantity or choose another payment method.');
+                return;
+            }
+
+            totalWithFee += additionalFee; // Add the additional fee for COD
+        }
+
+        const formattedTotalWithFee = new Intl.NumberFormat('en-PH', {
+            style: 'currency',
+            currency: 'PHP'
+        }).format(totalWithFee);
+
+        orderMessageTextarea.value = orderMessageTextarea.value;
+
         paymentDetails.innerHTML = `
             Selected Payment Method: ${paymentMethod}<br>
             Name: ${deliveryAddress.fullname}<br>
             Contact Number: ${deliveryAddress.contact}<br>
-            Address: ${deliveryAddress.address}
+            Address: ${deliveryAddress.address}<br>
+            Additional Fee: ₱${additionalFee}<br>
+            Total Price: ${formattedTotalWithFee}
         `;
 
         hidePaymentButtons();
 
-        // Set the selected payment method in the hidden input field
         paymentMethodInput.value = paymentMethod;
 
-        // Enable the submit button after payment method selection
         document.querySelector('input[name="checkout"]').disabled = false;
-    } else {
-        console.error('Input element not found');
     }
 }
-
 
 
 </script>
@@ -194,13 +238,25 @@ $deliveryOption = '';
 <?php
 
 if (isset($_POST['checkout'])) {
+  
     // Step 1: Insert a new order record into order_list
     $refCode = "ORD_" . date("YmdHis") . "_" . $userId;
     $paymentMethod = isset($_POST['payment_method']) ? mysqli_real_escape_string($conn, $_POST['payment_method']) : '';
     $deliveryAddress = isset($_POST['delivery_address']) ? mysqli_real_escape_string($conn, $_POST['delivery_address']) : '';
+    $orderMessage = isset($_POST['order_message']) ? mysqli_real_escape_string($conn, $_POST['order_message']) : '';
 
-    $insertOrderSql = "INSERT INTO order_list (ref_code, client_id, total_amount, delivery_address, payment_method, status)
-                        VALUES ('$refCode', $userId, $totalPrice, '$address', '$paymentMethod', 0)";
+    $additionalFee = 0;
+
+    if ($paymentMethod === 'Cash on Delivery') {
+        $additionalFee = 300;
+    }
+
+    $totalPrice += $additionalFee;
+
+    $insertOrderSql = "INSERT INTO order_list (ref_code, client_id, total_amount, delivery_address, payment_method, message, status, order_receive)
+    VALUES ('$refCode', $userId, $totalPrice, '$deliveryAddress', '$paymentMethod', '$orderMessage', 0, 0)";
+
+
 
     if (mysqli_query($conn, $insertOrderSql)) {
         // Step 2: Retrieve the order_id of the newly inserted order
@@ -226,6 +282,17 @@ if (isset($_POST['checkout'])) {
             echo "Error inserting notification record: " . mysqli_error($conn);
             exit;
         }
+
+        $insertAdminNotificationSql = "INSERT INTO admin_notifications (order_id, order_products_id, notification_type, is_approved, is_read, timestamp) 
+        VALUES ($orderId, $product_id, 'order', 1, 0, current_timestamp())";
+
+            if (!mysqli_query($conn, $insertAdminNotificationSql)) {
+            // Handle the insert admin notification query error
+            mysqli_rollback($conn);
+            echo "Error inserting admin notification record: " . mysqli_error($conn);
+            exit;
+            }
+
 
         while ($cartItem = mysqli_fetch_assoc($cartItemsResult)) {
             $productId = $cartItem['product_id'];
@@ -401,5 +468,5 @@ if (isset($_POST['checkout'])) {
 
 ?>
 
-
+<br><br><br>
 <?php include('partials-front/footer.php'); ?>

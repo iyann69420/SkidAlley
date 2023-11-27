@@ -51,6 +51,7 @@
                         $deliveryAddress = $rows['delivery_address'];
                         $paymentMethod = $rows['payment_method'];
                         $status = $rows['status'];
+                        $order_receive = $rows['order_receive'];
                         $date_ordered = $rows['date_created'];
 
                         // Define status labels based on the status values
@@ -62,8 +63,15 @@
                             4 => 'Delivered',
                             5 => 'Cancelled'
                         );
-                        $statusLabel = isset($statusLabels[$status]) ? $statusLabels[$status] : 'Unknown';
 
+                        // Modify the status label based on order_received
+                        if ($order_receive == 1) {
+                            $statusLabel = 'Delivered (Received)';
+                            $statusCellStyle = 'background-color: #00cc66; color: #fff;'; // CSS styling
+                        } else {
+                            $statusLabel = isset($statusLabels[$status]) ? $statusLabels[$status] : 'Unknown';
+                            $statusCellStyle = ''; // No additional styling
+                        }
                         ?>
 
                         <tr>
@@ -72,9 +80,9 @@
                             <td><?php echo $ref_code; ?></td>
                             <td><?php echo $client_id; ?></td>
                             <td><?php echo $deliveryAddress; ?></td>
-                            <td>₱<?php echo $total_amount; ?></td>
+                            <td>₱<?php echo number_format($total_amount); ?></td>
                             <td><?php echo $paymentMethod ?></td>
-                            <td class="status-label <?php echo strtolower(str_replace(' ', '-', $statusLabel)); ?>"><?php echo $statusLabel; ?></td>
+                            <td style="<?php echo $statusCellStyle; ?>" class="status-label <?php echo strtolower(str_replace(' ', '-', $statusLabel)); ?>"><?php echo $statusLabel; ?></td>
 
                             <td>
                                 <a href="<?php echo SITEURL; ?>admin/update-orders.php?id=<?php echo $id; ?>" class="btn-secondary">View Order</a>

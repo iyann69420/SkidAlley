@@ -7,4 +7,5 @@
     <a href="index.php" style="color: black"> <p> Return to Homepage </p> </a> 
 </body>
 </html>
+<h1>asdddddddddddddddddddd</h1>
 <?php include('partials-front/footer.php'); ?>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2023 at 12:46 PM
+-- Generation Time: Nov 26, 2023 at 07:40 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -42,8 +42,7 @@ CREATE TABLE `admin` (
 
 INSERT INTO `admin` (`id`, `fullname`, `username`, `password`, `userrole`, `avatar`) VALUES
 (23, 'Ian Salgado', 'admin1', 'e00cf25ad42683b3df678c61f42c6bda', 1, ''),
-(28, 'Ian Salgado', 'staff1', '4d7d719ac0cf3d78ea8a94701913fe47', 0, ''),
-(29, 'staff2', 'staff2', '8bc01711b8163ec3f2aa0688d12cdf3b', 0, '');
+(30, 'Full Name', 'staff1', '4d7d719ac0cf3d78ea8a94701913fe47', 0, '');
 
 -- --------------------------------------------------------
 
@@ -56,6 +55,7 @@ CREATE TABLE `admin_notifications` (
   `order_id` int(11) NOT NULL,
   `order_products_id` int(11) NOT NULL,
   `reason` text DEFAULT NULL,
+  `notification_type` varchar(20) NOT NULL,
   `is_approved` tinyint(4) NOT NULL DEFAULT 0,
   `is_read` tinyint(1) NOT NULL DEFAULT 0,
   `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -65,20 +65,33 @@ CREATE TABLE `admin_notifications` (
 -- Dumping data for table `admin_notifications`
 --
 
-INSERT INTO `admin_notifications` (`id`, `order_id`, `order_products_id`, `reason`, `is_approved`, `is_read`, `timestamp`) VALUES
-(18, 140, 0, 'asdasd', 0, 1, '2023-11-09 11:14:41'),
-(19, 141, 0, 'awaw', 0, 1, '2023-11-09 11:14:40'),
-(20, 142, 0, '2323', 0, 1, '2023-11-09 11:14:38'),
-(21, 143, 0, 'asdasdas', 0, 1, '2023-11-09 11:14:46'),
-(22, 144, 0, '11', 0, 1, '2023-11-09 11:14:45'),
-(23, 145, 0, 'tae', 0, 1, '2023-11-09 11:07:08'),
-(24, 146, 0, '2323232', 0, 1, '2023-11-06 22:52:14'),
-(25, 147, 0, 'asdasdasdas', 0, 1, '2023-11-06 22:51:55'),
-(26, 148, 0, ':(', 0, 1, '2023-11-09 11:17:37'),
-(27, 149, 0, 'asdasdas', 0, 1, '2023-11-09 11:28:36'),
-(28, 150, 0, 'walang pera', 0, 1, '2023-11-09 11:28:35'),
-(29, 151, 0, 'asdasdasdasdasdas', 0, 1, '2023-11-09 11:28:23'),
-(30, 152, 0, 'aaaaaaaaaaaaaa', 0, 0, '2023-11-09 11:29:26');
+INSERT INTO `admin_notifications` (`id`, `order_id`, `order_products_id`, `reason`, `notification_type`, `is_approved`, `is_read`, `timestamp`) VALUES
+(72, 194, 57, NULL, 'order', 1, 1, '2023-11-25 15:48:04'),
+(73, 195, 57, NULL, 'order', 1, 1, '2023-11-25 15:48:02'),
+(74, 196, 57, NULL, 'order', 1, 1, '2023-11-25 15:48:00'),
+(75, 197, 57, NULL, 'order', 1, 1, '2023-11-25 15:47:09'),
+(76, 198, 57, NULL, 'order', 1, 1, '2023-11-25 15:47:03'),
+(77, 197, 0, NULL, 'Order Received', 0, 1, '2023-11-25 15:36:26'),
+(78, 198, 0, NULL, 'Order Received', 1, 1, '2023-11-25 15:38:12'),
+(79, 199, 57, NULL, 'order', 1, 1, '2023-11-25 15:46:58'),
+(80, 199, 0, NULL, 'Order Received', 1, 1, '2023-11-25 15:46:54'),
+(81, 200, 57, NULL, 'order', 1, 1, '2023-11-25 15:46:51'),
+(82, 200, 0, NULL, 'Order Received', 2, 1, '2023-11-25 15:44:36'),
+(83, 201, 57, NULL, 'order', 1, 1, '2023-11-25 16:29:53'),
+(84, 202, 57, NULL, 'order', 1, 1, '2023-11-25 17:24:13'),
+(85, 203, 57, NULL, 'order', 1, 1, '2023-11-25 17:26:14'),
+(86, 204, 57, NULL, 'order', 1, 1, '2023-11-25 17:47:25'),
+(87, 205, 57, NULL, 'order', 1, 1, '2023-11-25 18:20:40'),
+(88, 206, 57, NULL, 'order', 1, 1, '2023-11-25 18:20:45'),
+(89, 207, 57, NULL, 'order', 1, 1, '2023-11-25 18:20:42'),
+(90, 208, 57, NULL, 'order', 1, 1, '2023-11-25 18:26:16'),
+(91, 209, 57, NULL, 'order', 1, 0, '2023-11-26 16:46:04'),
+(92, 210, 57, NULL, 'order', 1, 0, '2023-11-26 16:48:52'),
+(93, 211, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:03'),
+(94, 212, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:06'),
+(95, 213, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:10'),
+(96, 214, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:26'),
+(97, 215, 57, NULL, 'order', 1, 0, '2023-11-26 18:34:54');
 
 -- --------------------------------------------------------
 
@@ -129,7 +142,7 @@ CREATE TABLE `cart_list` (
 
 INSERT INTO `cart_list` (`id`, `client_id`, `product_id`, `product_colors_sizes_id`, `color`, `size`, `quantity`) VALUES
 (101, 8, 57, 0, 'pink', 'small', 2),
-(110, 11, 57, 0, 'pink', 'medium', 30);
+(113, 31, 57, 0, 'pink', 'medium', 1);
 
 -- --------------------------------------------------------
 
@@ -156,8 +169,7 @@ INSERT INTO `categories` (`id`, `category`, `description`, `status`, `delete_fla
 (23, 'Body', '', 1, 0),
 (27, 'Breaks', '', 1, 0),
 (29, 'Handles', '', 1, 0),
-(30, 'Bike Set', '', 1, 0),
-(87, 'wow', '', 1, 0);
+(30, 'Bike Set', '', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -178,9 +190,6 @@ CREATE TABLE `category_brands` (
 INSERT INTO `category_brands` (`id`, `category_id`, `brand_id`) VALUES
 (10, 30, 31),
 (11, 29, 34),
-(13, 87, 31),
-(14, 87, 32),
-(15, 87, 33),
 (18, 19, 35),
 (19, 27, 36),
 (20, 27, 37),
@@ -213,19 +222,7 @@ CREATE TABLE `client_list` (
 --
 
 INSERT INTO `client_list` (`id`, `username`, `fullname`, `contact`, `address`, `email`, `password`, `status`, `delete_flag`) VALUES
-(8, 'vak', 'VAL', '69', 'Blk 52  Lot 3 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'googlee@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(9, 'username', 'fullname', '123123', 'Blk 5  Lot 3 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'google@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(10, 'xd', 'XD', '12312312', 'Blk 5  Lot 3 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'google@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(11, 'iansalgado15', 'Ian Salgado', '0916462354', 'Trece', 'google@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(12, 'admin1', 'Ian Salgado', '1212312', 'etivac', 'jendeukie567@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(13, 'ayygoo15', 'Ian Salgado', '091321231', 'Blk 20 Lot 5 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'jendeukie567@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(14, 'admin69', 'Ian Salgado', '12312312', 'Blk 5  Lot 3 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'google@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(23, '', '', '', '', '', '', 1, 0),
-(24, 'sanagumana', 'fullname', '12345', 'Blk 5  Lot 3 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'jendeukie567@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(27, 'iansalgado11', 'Ian Salgado', '1234', 'Blk 5  Lot 3 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'jendeukie567@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(28, 'ririxd', 'XD', '12121', 'etivac', 'salgadoerine@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(29, 'admin123', 'fullname', '12312', 'Blk 5  Lot 3 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'jendeukie567@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0),
-(30, 'cathy', 'cathy', '123123', 'Trece', 'catherinesalgado23@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0);
+(31, 'iansalgado15', 'Ian Salgado', '09161661368', 'Blk 20 Lot 5 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'jendeukie567@gmail.com', '827ccb0eea8a706c4c34a16891f84e7b', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -315,12 +312,21 @@ INSERT INTO `content_management_logo` (`id`, `logo`) VALUES
 CREATE TABLE `discounts` (
   `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
+  `brand_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
   `discount_percentage` decimal(5,2) NOT NULL,
   `start_time` datetime DEFAULT NULL,
   `end_time` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `discounts`
+--
+
+INSERT INTO `discounts` (`id`, `product_id`, `brand_id`, `category_id`, `discount_percentage`, `start_time`, `end_time`, `created_at`, `updated_at`) VALUES
+(11, 57, NULL, NULL, 50.00, '2023-11-27 00:00:00', '2023-11-30 00:00:00', '2023-11-27 01:56:44', '2023-11-27 01:56:44');
 
 -- --------------------------------------------------------
 
@@ -345,12 +351,12 @@ CREATE TABLE `notifications` (
 
 INSERT INTO `notifications` (`notification_id`, `user_id`, `message`, `notification_type`, `timestamp`, `status`, `is_read`, `promo_id`) VALUES
 (8, 29, 'Your order has been placed successfully. Your order reference code is: ORD_20231022172428_29', 'order', '2023-10-22 17:24:28', 'new', 0, 0),
-(51, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231109121338_11', 'Order', '2023-11-09 12:13:38', 'new', 0, 0),
-(52, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231109121759_11', 'Order', '2023-11-09 12:17:59', 'new', 0, 0),
-(53, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231109122330_11', 'Order', '2023-11-09 12:23:30', 'new', 0, 0),
-(54, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231109122649_11', 'Order', '2023-11-09 12:26:49', 'new', 0, 0),
-(55, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231109122848_11', 'Order', '2023-11-09 12:28:48', 'new', 0, 0),
-(56, 11, 'Your order has been canceled successfully.', 'Cancellation', '2023-11-09 12:42:13', 'new', 0, 0);
+(112, 11, 'Your Order Is Packed and ready for delivery.', 'Packed', '2023-11-17 19:01:49', 'new', 0, 0),
+(113, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231120102015_11', 'Order', '2023-11-20 10:20:15', 'new', 0, 0),
+(114, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231120102337_11', 'Order', '2023-11-20 10:23:37', 'new', 0, 0),
+(115, 11, 'Your Order Is Packed and ready for delivery.', 'Packed', '2023-11-20 10:24:10', 'new', 0, 0),
+(116, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231120102605_11', 'Order', '2023-11-20 10:26:05', 'new', 0, 0),
+(147, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231126193454_31', 'Order', '2023-11-26 19:34:54', 'new', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -378,7 +384,9 @@ CREATE TABLE `order_list` (
   `total_amount` float NOT NULL DEFAULT 0,
   `delivery_address` text NOT NULL,
   `payment_method` varchar(250) NOT NULL,
+  `message` varchar(255) NOT NULL,
   `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=pending,1 = packed, 2 = for delivery, 3 = on the way, 4 = delivered, 5=cancelled',
+  `order_receive` tinyint(1) NOT NULL,
   `date_created` datetime NOT NULL DEFAULT current_timestamp(),
   `date_updated` datetime DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -387,12 +395,8 @@ CREATE TABLE `order_list` (
 -- Dumping data for table `order_list`
 --
 
-INSERT INTO `order_list` (`id`, `ref_code`, `client_id`, `total_amount`, `delivery_address`, `payment_method`, `status`, `date_created`, `date_updated`) VALUES
-(148, 'ORD_20231109121338_11', 11, 615615, 'Trece', 'Pickup', 5, '2023-11-09 19:13:38', '2023-11-09 19:15:27'),
-(149, 'ORD_20231109121759_11', 11, 1231230, 'Trece', 'Pickup', 5, '2023-11-09 19:17:59', '2023-11-09 19:18:41'),
-(150, 'ORD_20231109122330_11', 11, 1231230, 'Trece', 'Pickup', 5, '2023-11-09 19:23:30', '2023-11-09 19:23:54'),
-(151, 'ORD_20231109122649_11', 11, 1231230, 'Trece', 'Pickup', 5, '2023-11-09 19:26:49', '2023-11-09 19:30:42'),
-(152, 'ORD_20231109122848_11', 11, 3693690, 'Trece', 'Pickup', 5, '2023-11-09 19:28:48', '2023-11-09 19:35:59');
+INSERT INTO `order_list` (`id`, `ref_code`, `client_id`, `total_amount`, `delivery_address`, `payment_method`, `message`, `status`, `order_receive`, `date_created`, `date_updated`) VALUES
+(215, 'ORD_20231126193454_31', 31, 61561.5, 'Blk 20 Lot 5 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'Pickup', '', 0, 0, '2023-11-27 02:34:54', NULL);
 
 -- --------------------------------------------------------
 
@@ -415,11 +419,7 @@ CREATE TABLE `order_products` (
 --
 
 INSERT INTO `order_products` (`id`, `order_id`, `product_id`, `quantity`, `price_per_unit`, `color`, `size`) VALUES
-(78, 148, 57, 5, 123123.00, 'pink', 'medium'),
-(79, 149, 57, 10, 123123.00, 'pink', 'medium'),
-(80, 150, 57, 10, 123123.00, 'pink', 'medium'),
-(81, 151, 57, 10, 123123.00, 'pink', 'medium'),
-(82, 152, 57, 30, 123123.00, 'pink', 'medium');
+(145, 215, 57, 1, 123123.00, 'pink', 'medium');
 
 -- --------------------------------------------------------
 
@@ -480,13 +480,17 @@ INSERT INTO `product_list` (`id`, `brand_id`, `category_id`, `name`, `models`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `request_meta`
+-- Table structure for table `reviews`
 --
 
-CREATE TABLE `request_meta` (
-  `request_id` int(10) NOT NULL,
-  `meta_field` int(11) NOT NULL,
-  `meta_value` int(11) NOT NULL
+CREATE TABLE `reviews` (
+  `id` int(11) NOT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `client_id` int(11) DEFAULT NULL,
+  `image_path` varchar(255) DEFAULT NULL,
+  `stars` int(11) DEFAULT NULL,
+  `review_text` text DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -547,12 +551,12 @@ INSERT INTO `stock_list` (`id`, `product_id`, `product_colors_sizes_id`, `quanti
 (5, 39, 187, 230),
 (8, 39, 188, 300),
 (9, 39, 193, 140),
-(11, 57, 0, 2794),
-(12, 57, 199, 717),
-(13, 57, 200, 950),
-(14, 57, 201, 830),
-(15, 57, 202, 610),
-(16, 57, 203, 849);
+(11, 57, 0, 2798),
+(12, 57, 199, 716),
+(13, 57, 200, 841),
+(14, 57, 201, 834),
+(15, 57, 202, 614),
+(16, 57, 203, 853);
 
 -- --------------------------------------------------------
 
@@ -579,13 +583,18 @@ INSERT INTO `supplier_list` (`id`, `supplier_name`, `address`, `contact`, `email
 -- --------------------------------------------------------
 
 --
--- Table structure for table `system_info`
+-- Table structure for table `vouchers`
 --
 
-CREATE TABLE `system_info` (
-  `id` int(10) NOT NULL,
-  `meta_field` text NOT NULL,
-  `meta_value` text NOT NULL
+CREATE TABLE `vouchers` (
+  `voucher_id` int(11) NOT NULL,
+  `code` varchar(20) DEFAULT NULL,
+  `client_id` int(11) DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
+  `expiration_date` date DEFAULT NULL,
+  `is_redeemed` tinyint(1) DEFAULT 0,
+  `redeemed_date` date DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -716,10 +725,12 @@ ALTER TABLE `product_list`
   ADD KEY `category_id` (`category_id`);
 
 --
--- Indexes for table `request_meta`
+-- Indexes for table `reviews`
 --
-ALTER TABLE `request_meta`
-  ADD KEY `request_id` (`request_id`);
+ALTER TABLE `reviews`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `order_id` (`order_id`),
+  ADD KEY `client_id` (`client_id`);
 
 --
 -- Indexes for table `service_list`
@@ -749,10 +760,11 @@ ALTER TABLE `supplier_list`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `system_info`
+-- Indexes for table `vouchers`
 --
-ALTER TABLE `system_info`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `vouchers`
+  ADD PRIMARY KEY (`voucher_id`),
+  ADD UNIQUE KEY `code` (`code`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -762,13 +774,13 @@ ALTER TABLE `system_info`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `admin_notifications`
 --
 ALTER TABLE `admin_notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `brand_list`
@@ -780,7 +792,7 @@ ALTER TABLE `brand_list`
 -- AUTO_INCREMENT for table `cart_list`
 --
 ALTER TABLE `cart_list`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -798,7 +810,7 @@ ALTER TABLE `category_brands`
 -- AUTO_INCREMENT for table `client_list`
 --
 ALTER TABLE `client_list`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `content_management_aboutus`
@@ -828,13 +840,13 @@ ALTER TABLE `content_management_logo`
 -- AUTO_INCREMENT for table `discounts`
 --
 ALTER TABLE `discounts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `notification_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
 
 --
 -- AUTO_INCREMENT for table `order_items`
@@ -846,13 +858,13 @@ ALTER TABLE `order_items`
 -- AUTO_INCREMENT for table `order_list`
 --
 ALTER TABLE `order_list`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=153;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
 
 --
 -- AUTO_INCREMENT for table `order_products`
 --
 ALTER TABLE `order_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=83;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
 
 --
 -- AUTO_INCREMENT for table `product_colors_sizes`
@@ -865,6 +877,12 @@ ALTER TABLE `product_colors_sizes`
 --
 ALTER TABLE `product_list`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+
+--
+-- AUTO_INCREMENT for table `reviews`
+--
+ALTER TABLE `reviews`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `service_list`
@@ -889,12 +907,6 @@ ALTER TABLE `stock_list`
 --
 ALTER TABLE `supplier_list`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-
---
--- AUTO_INCREMENT for table `system_info`
---
-ALTER TABLE `system_info`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -927,6 +939,13 @@ ALTER TABLE `order_products`
 --
 ALTER TABLE `product_colors_sizes`
   ADD CONSTRAINT `product_colors_sizes_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `product_list` (`id`);
+
+--
+-- Constraints for table `reviews`
+--
+ALTER TABLE `reviews`
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `order_list` (`id`),
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`client_id`) REFERENCES `client_list` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

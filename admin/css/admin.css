@@ -125,78 +125,78 @@ table tr td{
 
 /* CSS for menu */
 
-.menu {
-    border-bottom: 1px solid grey;
-    background-color: black;
-    left: -250px;
-}
+    .menu {
+        border-bottom: 1px solid grey;
+        background-color: black;
+        left: -250px;
+    }
 
-.menu.open {
-    right: 30px; /* Move the menu back on-screen when the 'open' class is applied */
-}
+    .menu.open {
+        right: 30px; /* Move the menu back on-screen when the 'open' class is applied */
+    }
 
-.menu ul li a:hover {
-    color: orange;
-}
+    .menu ul li a:hover {
+        color: orange;
+    }
 
-.text-center .menu {
-    text-align: left;
-}
+    .text-center .menu {
+        text-align: left;
+    }
 
-.text-center #sidebarCollapse {
-    text-align: left;
-}
+    .text-center #sidebarCollapse {
+        text-align: left;
+    }
 
-.dropdown {
-    position: relative;
-    display: inline-block;
-}
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
 
-.dropdown:hover .sub-menu {
-    display: block;
-    position: absolute; /* Add this to position the sub-menu properly */
-    top: 100%; /* Position the sub-menu below the parent */
-    left: 0; /* Align the sub-menu with the left edge of the parent */
-    background-color: #111 !important;
-    min-width: 150px;
-    z-index: 1;
-}
-.sub-menu {
-    display: none;
-}
+    .dropdown:hover .sub-menu {
+        display: block;
+        position: absolute; /* Add this to position the sub-menu properly */
+        top: 100%; /* Position the sub-menu below the parent */
+        left: 0; /* Align the sub-menu with the left edge of the parent */
+        background-color: #111 !important;
+        min-width: 150px;
+        z-index: 1;
+    }
+    .sub-menu {
+        display: none;
+    }
 
-.sub-menu li {
-    padding: 0px 0;
-}
+    .sub-menu li {
+        padding: 0px 0;
+    }
 
-.dropdown a {
-    text-decoration: none;
-    color: #fff !important;
-    display: block;
-    background-color: #111;
-}
+    .dropdown a {
+        text-decoration: none;
+        color: #fff !important;
+        display: block;
+        background-color: #111;
+    }
 
-.dropdown a {
-    text-decoration: none;
-    color: #333;
-    display: block;
-}
+    .dropdown a {
+        text-decoration: none;
+        color: #333;
+        display: block;
+    }
 
-.dropdown:hover a {
-    color: #111;
-}
+    .dropdown:hover a {
+        color: #111;
+    }
 
-.dropdown:hover .sub-menu {
-    display: block;
-}
-.rotate {
-    transform: rotate(180deg);
-    transition: transform 0.3s ease; /* Add a smooth transition effect */
-}
-.sidebar ul li ul li a {
-    cursor: pointer; /* Set the cursor to pointer (finger) */
-    /* Add other styles as needed for your design */
-}
+    .dropdown:hover .sub-menu {
+        display: block;
+    }
+    .rotate {
+        transform: rotate(180deg);
+        transition: transform 0.3s ease; /* Add a smooth transition effect */
+    }
+    .sidebar ul li ul li a {
+        cursor: pointer; /* Set the cursor to pointer (finger) */
+        /* Add other styles as needed for your design */
+    }
 
 /* CSS for main content */
 .main-content{
@@ -490,5 +490,5 @@ input[type="submit"].btn-secondary:hover {
     color: #fff; /* Text color */
 }
 
-/* Add similar classes for other status labels */
+
 

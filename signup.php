@@ -12,6 +12,14 @@ require 'vendor/autoload.php';?>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/themes/default.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
+
+    
+
 
 </head>
 
@@ -77,6 +85,14 @@ require 'vendor/autoload.php';?>
             echo $_SESSION['blank'];
             unset($_SESSION['blank']);
         }
+        if (isset($_SESSION['email_exists'])) {
+            echo $_SESSION['email_exists'];
+            unset($_SESSION['email_exists']);
+        }
+        if (isset($_SESSION['contact_error'])) {
+            echo $_SESSION['contact_error'];
+            unset($_SESSION['contact_error']);
+        }
 
 
         ?>
@@ -95,20 +111,20 @@ require 'vendor/autoload.php';?>
         <input type="text" name="address" placeholder="Home address" value="<?php echo isset($_POST['address']) ? $_POST['address'] : ''; ?>">
         <input type="email" name="email" placeholder="E-mail address" value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>">
 
-        <div class="password-container">
-    <input type="password" name="password" id="password" class="password-input" placeholder="Password">
-    <span class="password-icon" onclick="togglePassword('password', 'togglePasswordIcon')">
-        <i id="togglePasswordIcon" class="fa fa-eye-slash" aria-hidden="true"></i>
-    </span>
-</div>
+                <div class="password-container">
+            <input type="password" name="password" id="password" class="password-input" placeholder="Password">
+            <span class="password-icon" onclick="togglePassword('password', 'togglePasswordIcon')">
+                <i id="togglePasswordIcon" class="fa fa-eye-slash" aria-hidden="true"></i>
+            </span>
+        </div>
 
-<!-- Confirm Password input field with the eye icon inside the text box -->
-<div class="password-container">
-    <input type="password" name="confirm_password" id="confirm_password" class="password-input" placeholder="Confirm Password">
-    <span class="password-icon" onclick="togglePassword('confirm_password', 'toggleConfirmPasswordIcon')">
-        <i id="toggleConfirmPasswordIcon" class="fa fa-eye-slash" aria-hidden="true"></i>
-    </span>
-</div>
+    <!-- Confirm Password input field with the eye icon inside the text box -->
+    <div class="password-container">
+        <input type="password" name="confirm_password" id="confirm_password" class="password-input" placeholder="Confirm Password">
+        <span class="password-icon" onclick="togglePassword('confirm_password', 'toggleConfirmPasswordIcon')">
+            <i id="toggleConfirmPasswordIcon" class="fa fa-eye-slash" aria-hidden="true"></i>
+        </span>
+    </div>
         
         <input type="submit" name="submit" value="Submit" name="signup" > 
         </form>
@@ -119,17 +135,49 @@ require 'vendor/autoload.php';?>
 <?php
 if(isset($_POST['submit']))
 {
-    //Button Clicked
-    //echo "Button Clicked";
+    
+
+
     $username = $_POST['username'];
     $check_username = "SELECT * FROM client_list WHERE username = '$username'";
     $check_result = mysqli_query($conn, $check_username);
+
+    if(empty($_POST['username']) || empty($_POST['fullname']) || empty($_POST['contact']) || empty($_POST['address']) || empty($_POST['email']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
+       
+        $_SESSION['empty'] = "Please fill in all the fields.";
+       
+        
+        header("location: signup.php");
+        exit;
+    }
+    $email = $_POST['email'];
+    $check_email_query = "SELECT * FROM client_list WHERE email = '$email'";
+    $check_email_result = mysqli_query($conn, $check_email_query);
+
+    if (mysqli_num_rows($check_email_result) > 0) {
+        $_SESSION['email_exists'] = "Email already exists. Please use a different email.";
+        header("location: signup.php");
+        exit;
+    }
+
+    // Check if contact is 11 digits
+    $contact = $_POST['contact'];
+    if (strlen($contact) !== 11) {
+        $_SESSION['contact_error'] = "Contact must be 11 digits.";
+        header("location: signup.php");
+        exit;
+    }
+
     if(mysqli_num_rows($check_result) > 0) {
         // Username already exists
         $_SESSION['blank'] = "Username already exists. Please choose a different username.";
+        
+        
         header("location: signup.php");
         exit;
-    }else{
+    }
+    else{
+
     //get data from Form
     $username = $_POST['username'];
     $fullname = $_POST['fullname'];
@@ -140,17 +188,11 @@ if(isset($_POST['submit']))
     
     $password = md5($_POST['password']); //Password Encrption with MD5
    
-    if(empty($_POST['username']) || empty($_POST['fullname']) || empty($_POST['contact']) || empty($_POST['address']) || empty($_POST['email']) || empty($_POST['password']) || empty($_POST['confirm_password'])) {
-       
-        $_SESSION['empty'] = "Please fill in all the fields.";
-       
-        header("location: signup.php");
-        exit;
-    }
- 
+   
     // Check if the password matches the confirm password
     if ($password !== $confirm_password) {
         $_SESSION['password_mismatch'] = "Password did not match";
+      
         header("location: signup.php");
         exit;
     }
