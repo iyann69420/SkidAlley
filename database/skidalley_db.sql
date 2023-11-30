@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2023 at 07:40 PM
+-- Generation Time: Nov 30, 2023 at 05:21 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -58,40 +58,19 @@ CREATE TABLE `admin_notifications` (
   `notification_type` varchar(20) NOT NULL,
   `is_approved` tinyint(4) NOT NULL DEFAULT 0,
   `is_read` tinyint(1) NOT NULL DEFAULT 0,
-  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `timestamp` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `gcash_receipts_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `admin_notifications`
 --
 
-INSERT INTO `admin_notifications` (`id`, `order_id`, `order_products_id`, `reason`, `notification_type`, `is_approved`, `is_read`, `timestamp`) VALUES
-(72, 194, 57, NULL, 'order', 1, 1, '2023-11-25 15:48:04'),
-(73, 195, 57, NULL, 'order', 1, 1, '2023-11-25 15:48:02'),
-(74, 196, 57, NULL, 'order', 1, 1, '2023-11-25 15:48:00'),
-(75, 197, 57, NULL, 'order', 1, 1, '2023-11-25 15:47:09'),
-(76, 198, 57, NULL, 'order', 1, 1, '2023-11-25 15:47:03'),
-(77, 197, 0, NULL, 'Order Received', 0, 1, '2023-11-25 15:36:26'),
-(78, 198, 0, NULL, 'Order Received', 1, 1, '2023-11-25 15:38:12'),
-(79, 199, 57, NULL, 'order', 1, 1, '2023-11-25 15:46:58'),
-(80, 199, 0, NULL, 'Order Received', 1, 1, '2023-11-25 15:46:54'),
-(81, 200, 57, NULL, 'order', 1, 1, '2023-11-25 15:46:51'),
-(82, 200, 0, NULL, 'Order Received', 2, 1, '2023-11-25 15:44:36'),
-(83, 201, 57, NULL, 'order', 1, 1, '2023-11-25 16:29:53'),
-(84, 202, 57, NULL, 'order', 1, 1, '2023-11-25 17:24:13'),
-(85, 203, 57, NULL, 'order', 1, 1, '2023-11-25 17:26:14'),
-(86, 204, 57, NULL, 'order', 1, 1, '2023-11-25 17:47:25'),
-(87, 205, 57, NULL, 'order', 1, 1, '2023-11-25 18:20:40'),
-(88, 206, 57, NULL, 'order', 1, 1, '2023-11-25 18:20:45'),
-(89, 207, 57, NULL, 'order', 1, 1, '2023-11-25 18:20:42'),
-(90, 208, 57, NULL, 'order', 1, 1, '2023-11-25 18:26:16'),
-(91, 209, 57, NULL, 'order', 1, 0, '2023-11-26 16:46:04'),
-(92, 210, 57, NULL, 'order', 1, 0, '2023-11-26 16:48:52'),
-(93, 211, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:03'),
-(94, 212, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:06'),
-(95, 213, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:10'),
-(96, 214, 57, NULL, 'order', 1, 0, '2023-11-26 16:51:26'),
-(97, 215, 57, NULL, 'order', 1, 0, '2023-11-26 18:34:54');
+INSERT INTO `admin_notifications` (`id`, `order_id`, `order_products_id`, `reason`, `notification_type`, `is_approved`, `is_read`, `timestamp`, `gcash_receipts_id`) VALUES
+(196, 240, 170, NULL, 'Receipt Uploaded', 3, 1, '2023-11-29 18:43:29', 14),
+(197, 242, 57, NULL, 'order', 1, 1, '2023-11-29 18:41:43', NULL),
+(198, 242, 171, NULL, 'Receipt Uploaded', 3, 1, '2023-11-29 18:38:57', 15),
+(199, 240, 0, 'asdas', '', 0, 1, '2023-11-29 18:47:17', NULL);
 
 -- --------------------------------------------------------
 
@@ -142,7 +121,7 @@ CREATE TABLE `cart_list` (
 
 INSERT INTO `cart_list` (`id`, `client_id`, `product_id`, `product_colors_sizes_id`, `color`, `size`, `quantity`) VALUES
 (101, 8, 57, 0, 'pink', 'small', 2),
-(113, 31, 57, 0, 'pink', 'medium', 1);
+(114, 31, 57, 0, 'red', 'small', 1);
 
 -- --------------------------------------------------------
 
@@ -283,7 +262,7 @@ CREATE TABLE `content_management_contactus` (
 --
 
 INSERT INTO `content_management_contactus` (`id`, `contactus`, `font`, `text_size`) VALUES
-(1, '<span style=\"font-family: &quot;Times New Roman&quot;;\">Feel free to reach out to us with any questions or concerns. We\'re here to help!\r\n\r\nOur Address:\r\n- 123 Main Street\r\n- Cityville, State 12345\r\n- Country\r\n\r\nPhone Number:\r\n- Main Office: (555) 123-4567\r\n- Customer Support: (555) 987-6543\r\n\r\nEmail:\r\n- General Inquiries: info@example.com\r\n- Support: support@example.com\r\n\r\nYou can also visit our website at www.example.com for more information and online support.</span>\r\n\r\n', 'Comic Sans MS', 25);
+(1, '<span style=\"font-family: \" times=\"\" new=\"\" roman\";\"=\"\">Feel free to reach out to us with any questions or concerns. We\'re here to help!\r\n\r\nOur Address:\r\n- 123 Main Street\r\n- Cityville, State 12345\r\n- Country\r\n\r\nPhone Number:\r\n- Main Office: (555) 123-4567\r\n- Customer Support: (555) 987-6543\r\n\r\nEmail:\r\n- General Inquiries: info@example.com\r\n- Support: support@example.com\r\n\r\nYou can also visit our website at www.example.com for more information and online support.</span>', 'Comic Sans MS', 25);
 
 -- --------------------------------------------------------
 
@@ -326,7 +305,28 @@ CREATE TABLE `discounts` (
 --
 
 INSERT INTO `discounts` (`id`, `product_id`, `brand_id`, `category_id`, `discount_percentage`, `start_time`, `end_time`, `created_at`, `updated_at`) VALUES
-(11, 57, NULL, NULL, 50.00, '2023-11-27 00:00:00', '2023-11-30 00:00:00', '2023-11-27 01:56:44', '2023-11-27 01:56:44');
+(31, 57, NULL, NULL, 50.00, '2023-11-30 03:07:00', '2023-11-30 03:13:00', '2023-11-30 03:07:53', '2023-11-30 03:07:53');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `gcash_receipts`
+--
+
+CREATE TABLE `gcash_receipts` (
+  `id` int(11) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `file_path` varchar(255) NOT NULL,
+  `upload_timestamp` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `gcash_receipts`
+--
+
+INSERT INTO `gcash_receipts` (`id`, `file_name`, `file_path`, `upload_timestamp`) VALUES
+(14, '66aa7bc9-75a4-48b1-ae62-ec4eaa1736ff.jpeg', 'images/gcash_receipts/66aa7bc9-75a4-48b1-ae62-ec4eaa1736ff.jpeg', '2023-11-29 17:16:31'),
+(15, 'gamedev-group-1-pili-ulit.pdf', 'images/gcash_receipts/gamedev-group-1-pili-ulit.pdf', '2023-11-29 17:32:52');
 
 -- --------------------------------------------------------
 
@@ -356,7 +356,31 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `message`, `notificat
 (114, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231120102337_11', 'Order', '2023-11-20 10:23:37', 'new', 0, 0),
 (115, 11, 'Your Order Is Packed and ready for delivery.', 'Packed', '2023-11-20 10:24:10', 'new', 0, 0),
 (116, 11, 'Your order has been placed successfully. Your order reference code is: ORD_20231120102605_11', 'Order', '2023-11-20 10:26:05', 'new', 0, 0),
-(147, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231126193454_31', 'Order', '2023-11-26 19:34:54', 'new', 0, 0);
+(152, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231127170948_31', 'Order', '2023-11-27 17:09:48', 'new', 0, 0),
+(153, 31, 'Your order has been canceled successfully.', 'Cancellation', '2023-11-28 16:01:58', 'new', 0, 0),
+(154, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128160245_31', 'Order', '2023-11-28 16:02:45', 'new', 0, 0),
+(155, 31, 'Your Order Has Been Delivered Successfully.', 'Delivered', '2023-11-28 16:05:29', 'new', 0, 0),
+(156, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128163207_31', 'Order', '2023-11-28 16:32:07', 'new', 0, 0),
+(157, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128200931_31', 'Order', '2023-11-28 20:09:31', 'new', 0, 0),
+(158, 31, 'Your Order Has Been Delivered Successfully.', 'Delivered', '2023-11-28 20:17:33', 'new', 0, 0),
+(159, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128202040_31', 'Order', '2023-11-28 20:20:40', 'new', 0, 0),
+(160, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128210904_31', 'Order', '2023-11-28 21:09:04', 'new', 0, 0),
+(161, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128212309_31', 'Order', '2023-11-28 21:23:09', 'new', 0, 0),
+(162, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128212523_31', 'Order', '2023-11-28 21:25:23', 'new', 0, 0),
+(163, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128212927_31', 'Order', '2023-11-28 21:29:27', 'new', 0, 0),
+(164, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128212931_31', 'Order', '2023-11-28 21:29:31', 'new', 0, 0),
+(165, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128212935_31', 'Order', '2023-11-28 21:29:35', 'new', 0, 0),
+(166, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128212947_31', 'Order', '2023-11-28 21:29:47', 'new', 0, 0),
+(167, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128213303_31', 'Order', '2023-11-28 21:33:03', 'new', 0, 0),
+(168, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128213332_31', 'Order', '2023-11-28 21:33:32', 'new', 0, 0),
+(169, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128213953_31', 'Order', '2023-11-28 21:39:53', 'new', 0, 0),
+(170, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128214042_31', 'Order', '2023-11-28 21:40:42', 'new', 0, 0),
+(171, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128214237_31', 'Order', '2023-11-28 21:42:37', 'new', 0, 0),
+(172, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128214528_31', 'Order', '2023-11-28 21:45:28', 'new', 0, 0),
+(173, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231128215813_31', 'Order', '2023-11-28 21:58:13', 'new', 1, 0),
+(174, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231129063413_31', 'Order', '2023-11-29 06:34:13', 'new', 0, 0),
+(175, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231129181009_31', 'Order', '2023-11-29 18:10:09', 'new', 0, 0),
+(176, 31, 'Your order has been placed successfully. Your order reference code is: ORD_20231129181721_31', 'Order', '2023-11-29 18:17:21', 'new', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -381,6 +405,7 @@ CREATE TABLE `order_list` (
   `id` int(10) NOT NULL,
   `ref_code` varchar(100) NOT NULL,
   `client_id` int(30) NOT NULL,
+  `gcash_receipts_id` int(11) DEFAULT NULL,
   `total_amount` float NOT NULL DEFAULT 0,
   `delivery_address` text NOT NULL,
   `payment_method` varchar(250) NOT NULL,
@@ -395,8 +420,9 @@ CREATE TABLE `order_list` (
 -- Dumping data for table `order_list`
 --
 
-INSERT INTO `order_list` (`id`, `ref_code`, `client_id`, `total_amount`, `delivery_address`, `payment_method`, `message`, `status`, `order_receive`, `date_created`, `date_updated`) VALUES
-(215, 'ORD_20231126193454_31', 31, 61561.5, 'Blk 20 Lot 5 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines', 'Pickup', '', 0, 0, '2023-11-27 02:34:54', NULL);
+INSERT INTO `order_list` (`id`, `ref_code`, `client_id`, `gcash_receipts_id`, `total_amount`, `delivery_address`, `payment_method`, `message`, `status`, `order_receive`, `date_created`, `date_updated`) VALUES
+(240, 'ORD_20231129181009_31', 31, 14, 1477480, '\"Blk 20 Lot 5 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines\"', 'Gcash', '', 0, 0, '2023-11-30 01:10:09', '2023-11-30 01:16:31'),
+(242, 'ORD_20231129181721_31', 31, 15, 123123, '\"Blk 20 Lot 5 Pacific Towns 2 Brgy Conchu Trece Martires City Cavite Philippines\"', 'Gcash', '', 0, 0, '2023-11-30 01:17:21', '2023-11-30 01:32:52');
 
 -- --------------------------------------------------------
 
@@ -419,7 +445,8 @@ CREATE TABLE `order_products` (
 --
 
 INSERT INTO `order_products` (`id`, `order_id`, `product_id`, `quantity`, `price_per_unit`, `color`, `size`) VALUES
-(145, 215, 57, 1, 123123.00, 'pink', 'medium');
+(170, 240, 57, 12, 123123.00, 'pink', 'medium'),
+(171, 242, 57, 1, 123123.00, 'red', 'small');
 
 -- --------------------------------------------------------
 
@@ -551,12 +578,12 @@ INSERT INTO `stock_list` (`id`, `product_id`, `product_colors_sizes_id`, `quanti
 (5, 39, 187, 230),
 (8, 39, 188, 300),
 (9, 39, 193, 140),
-(11, 57, 0, 2798),
-(12, 57, 199, 716),
-(13, 57, 200, 841),
-(14, 57, 201, 834),
+(11, 57, 0, 2799),
+(12, 57, 199, 717),
+(13, 57, 200, 587),
+(14, 57, 201, 835),
 (15, 57, 202, 614),
-(16, 57, 203, 853);
+(16, 57, 203, 854);
 
 -- --------------------------------------------------------
 
@@ -611,7 +638,8 @@ ALTER TABLE `admin`
 -- Indexes for table `admin_notifications`
 --
 ALTER TABLE `admin_notifications`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `gcash_receipt_id` (`gcash_receipts_id`);
 
 --
 -- Indexes for table `brand_list`
@@ -678,6 +706,12 @@ ALTER TABLE `content_management_logo`
 ALTER TABLE `discounts`
   ADD PRIMARY KEY (`id`),
   ADD KEY `product_id` (`product_id`);
+
+--
+-- Indexes for table `gcash_receipts`
+--
+ALTER TABLE `gcash_receipts`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `notifications`
@@ -780,7 +814,7 @@ ALTER TABLE `admin`
 -- AUTO_INCREMENT for table `admin_notifications`
 --
 ALTER TABLE `admin_notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=200;
 
 --
 -- AUTO_INCREMENT for table `brand_list`
@@ -792,7 +826,7 @@ ALTER TABLE `brand_list`
 -- AUTO_INCREMENT for table `cart_list`
 --
 ALTER TABLE `cart_list`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
 
 --
 -- AUTO_INCREMENT for table `categories`
@@ -840,13 +874,19 @@ ALTER TABLE `content_management_logo`
 -- AUTO_INCREMENT for table `discounts`
 --
 ALTER TABLE `discounts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT for table `gcash_receipts`
+--
+ALTER TABLE `gcash_receipts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=148;
+  MODIFY `notification_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
 
 --
 -- AUTO_INCREMENT for table `order_items`
@@ -858,13 +898,13 @@ ALTER TABLE `order_items`
 -- AUTO_INCREMENT for table `order_list`
 --
 ALTER TABLE `order_list`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=216;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=243;
 
 --
 -- AUTO_INCREMENT for table `order_products`
 --
 ALTER TABLE `order_products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=146;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=172;
 
 --
 -- AUTO_INCREMENT for table `product_colors_sizes`
@@ -911,6 +951,12 @@ ALTER TABLE `supplier_list`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `admin_notifications`
+--
+ALTER TABLE `admin_notifications`
+  ADD CONSTRAINT `admin_notifications_ibfk_1` FOREIGN KEY (`gcash_receipts_id`) REFERENCES `gcash_receipts` (`id`);
 
 --
 -- Constraints for table `category_brands`
