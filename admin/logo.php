@@ -81,7 +81,10 @@
             }
             ?>
         </table>
+        
     </div>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 </div>
+
 
 <?php include ('partials/footer.php');?>

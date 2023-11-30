@@ -138,6 +138,7 @@ $deliveryOption = '';
     <div class="payment-buttons">
         <button class="payment-button" type="button" onclick="showPaymentDetails('Pickup')">Pick Up</button>
         <button class="payment-button" type="button" onclick="showPaymentDetails('Cash on Delivery')">Cash on Delivery</button>
+        <button class="payment-button" type="button" onclick="showPaymentDetails('Gcash')">Gcash</button>
     </div>
     <div class="payment-details">
         <!-- Remove the duplicate input element -->
@@ -214,6 +215,9 @@ $deliveryOption = '';
 
         orderMessageTextarea.value = orderMessageTextarea.value;
 
+        // Set the delivery_address input value
+        deliveryAddressInput.value = JSON.stringify(deliveryAddress.address);
+
         paymentDetails.innerHTML = `
             Selected Payment Method: ${paymentMethod}<br>
             Name: ${deliveryAddress.fullname}<br>
@@ -230,6 +234,7 @@ $deliveryOption = '';
         document.querySelector('input[name="checkout"]').disabled = false;
     }
 }
+
 
 
 </script>
@@ -252,6 +257,7 @@ if (isset($_POST['checkout'])) {
     }
 
     $totalPrice += $additionalFee;
+    
 
     $insertOrderSql = "INSERT INTO order_list (ref_code, client_id, total_amount, delivery_address, payment_method, message, status, order_receive)
     VALUES ('$refCode', $userId, $totalPrice, '$deliveryAddress', '$paymentMethod', '$orderMessage', 0, 0)";

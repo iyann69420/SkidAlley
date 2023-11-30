@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>Login - Admin Skid Alley</title>
-        <link rel="stylesheet" href="../css/admin.css">
+        <link rel="stylesheet" href="./css/admin.css">
     </head>
 
     <body>

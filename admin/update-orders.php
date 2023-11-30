@@ -27,16 +27,21 @@
                 $paymentMethod = $row['payment_method'];
                 $status = $row['status'];
                 $order_receive = $row['order_receive'];
+                $message = $row['message'];
+                
             } else {
                 header('location:' . SITEURL . 'admin/orders.php');
             }
         }
+
+        
         ?>
 
         <br/><br/><br/>
 
         <form action="" method="POST">
             <table class="tbl-30">
+                
                 <tr>
                     <td>Client Name: </td>
                     <td><?php echo $client_id; ?></td>
@@ -55,6 +60,39 @@
                 <tr>
                     <td>Payment Method: </td>
                     <td><?php echo $paymentMethod; ?></td>
+                </tr>
+
+
+                
+                <?php if ($paymentMethod == 'Gcash'): ?>
+    <tr>
+        <td>Gcash Receipt: </td>
+        <td>
+            <?php
+            // Fetch Gcash receipt details
+            $gcashReceiptId = $row['gcash_receipts_id'];
+            $gcashReceiptSql = "SELECT file_path FROM gcash_receipts WHERE id = $gcashReceiptId";
+            $gcashReceiptResult = mysqli_query($conn, $gcashReceiptSql);
+
+            if ($gcashReceiptResult && mysqli_num_rows($gcashReceiptResult) > 0) {
+                $gcashReceiptRow = mysqli_fetch_assoc($gcashReceiptResult);
+                $gcashReceiptPath = $gcashReceiptRow['file_path'];
+
+                // Display the Gcash receipt image
+                echo '<img src="' . SITEURL . $gcashReceiptPath . '" alt="Gcash Receipt" width="100px">';
+            } else {
+                echo 'No Gcash receipt found';
+            }
+            ?>
+        </td>
+    </tr>
+<?php endif; ?>
+
+
+
+                <tr>
+                    <td>Message:</td>
+                    <td><strong><?php echo $message; ?></strong></td>
                 </tr>
 
                 <tr>
@@ -127,6 +165,13 @@
 
             // Update the status in the database
             $updateSql = "UPDATE order_list SET status = $newStatus WHERE id = $id";
+            $updateRes = mysqli_query($conn, $updateSql);
+
+          
+        
+            
+            $updateSql .= " WHERE id = $id";
+        
             $updateRes = mysqli_query($conn, $updateSql);
 
             if ($updateRes) {

@@ -52,10 +52,10 @@
                         <td><?php echo $product_id;?></td>
                         <td>%<?php echo $discount_percentage;?></td>
                         <td><?php echo $start_time;?></td>
-                        <td><?php echo $end_time;?></td>
+                        <td style="<?php echo (strtotime($end_time) < time()) ? 'background-color: red;' : ''; ?>"><?php echo $end_time;?></td>
                         <th><?php echo $created_at;?></th>
                         <th>
-                            <a href="<?php echo SITEURL; ?>admin/update-discount.php?id=<?php echo $id; ?>" class='btn-secondary'>Update Discount</a>
+                            <a href="<?php echo SITEURL; ?>admin/update_discounts.php?id=<?php echo $id; ?>" class='btn-secondary'>Update Discount</a>
                             <a href="<?php echo SITEURL; ?>admin/delete-discount.php?id=<?php echo $id; ?>" class="btn-third">Delete Discount</a>
 
                             </th>
@@ -63,12 +63,10 @@
                     </tr>
                     <?php
                         }
-                            }
-                                else
-                                {
-
-                            }
-                        }
+                    } else {
+                        // Handle the case where there are no discounts
+                    }
+                }
                     ?>
                    
                  </table>

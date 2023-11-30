@@ -7,10 +7,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $order_products_id = $_POST['order_products_id'];
         $reason = $_POST['reason'];
 
-        // Perform necessary validation and sanitization here
-        // ...
-
-        // Insert the cancellation request into the admin_notifications table using prepared statements
         $insertCancellationQuery = "INSERT INTO admin_notifications (order_id, order_products_id, reason, is_approved, is_read) VALUES (?, ?, ?, 0, 0)";
 
         $stmt = $conn->prepare($insertCancellationQuery);

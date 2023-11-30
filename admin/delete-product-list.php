@@ -1,41 +1,69 @@
 <?php
-include('../config/constants.php');
+date_default_timezone_set('Asia/Manila');
+// Include database connection and constants
+include ('../config/constants.php');
 
-if (isset($_GET['id']) && isset($_GET['image_name'])) {
-    $id = $_GET['id'];
-    $image_name = $_GET['image_name']; // Corrected variable name
-
-    if ($image_name != "") {
-        $path = "../images/bike/" . $image_name; 
-
-        $remove = unlink($path); // Added $ before path
-
-        if ($remove == false) {
-            $_SESSION['upload'] = "<div class='error'> Failed to Remove Image File. </div>";
-            header('location: ' . SITEURL . 'admin/product-list.php');
-            die();
-        }
-    }
-    $sql = "DELETE FROM product_list WHERE id=$id";
-    $res = mysqli_query($conn, $sql);
-
-    if ($res == true)
-     {
-        $_SESSION['delete'] = "<div class='success'>Product Deleted Successfully</div>";
-
-        header('location:' . SITEURL . 'admin/product-list.php');
-    } 
-    else 
-    {
-        $_SESSION['delete'] = "<div class='error'>Failed to Delete Product</div>";
-
-        header('location:' . SITEURL . 'admin/product-list.php');
-    }
-} 
-else 
-{
-    $_SESSION['unauthorize'] = "<div class='error'>Unauthorized Access.</div>";
-
-    header('location:' . SITEURL . 'admin/product-list.php');
+// Check database connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+// Get current timestamp
+$currentTimestamp = date("Y-m-d H:i:s");
+
+// Construct the SQL query to select rows where end_time has passed
+$selectSql = "SELECT * FROM discounts WHERE end_time < '$currentTimestamp'";
+
+
+// Output the SQL query for debugging
+echo "Debugging: $selectSql<br>";
+
+// Execute the select query
+$selectResult = $conn->query($selectSql);
+
+// Check for errors and affected rows
+if ($selectResult !== FALSE) {
+    $affectedRows = $selectResult->num_rows;
+
+    // Output the number of affected rows for debugging
+    echo "Debugging: Affected rows: $affectedRows<br>";
+
+    if ($affectedRows > 0) {
+        // Construct the SQL query to delete rows where end_time has passed
+        $deleteSql = "DELETE FROM discounts WHERE end_time < '$currentTimestamp'";
+
+        // Output the SQL query for debugging
+        echo "Debugging: $deleteSql<br>";
+
+        // Execute the delete query
+        $deleteResult = $conn->query($deleteSql);
+
+        // Check for errors and affected rows
+        if ($deleteResult !== FALSE) {
+            $affectedRows = $conn->affected_rows;
+
+            // Output the number of affected rows for debugging
+            echo "Debugging: Affected rows: $affectedRows<br>";
+
+            if ($affectedRows > 0) {
+                echo "Rows deleted successfully. Affected rows: $affectedRows.<br>";
+            } else {
+                echo "No rows deleted. No rows matched the condition.<br>";
+            }
+        } else {
+            // Output any error message for debugging
+            echo "Debugging: MySQL error message: " . $conn->error . "<br>";
+            echo "Error executing delete query: " . $conn->error;
+        }
+    } else {
+        echo "No rows to delete. No rows matched the condition.<br>";
+    }
+} else {
+    // Output any error message for debugging
+    echo "Debugging: MySQL error message: " . $conn->error . "<br>";
+    echo "Error executing select query: " . $conn->error;
+}
+
+// Close database connection
+$conn->close();
 ?>

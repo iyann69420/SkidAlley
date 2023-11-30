@@ -223,6 +223,7 @@ table tr td{
 .footer{
     color: white;
     background-color: black;
+    padding: 10px; /
   
 
 
@@ -251,7 +252,6 @@ table tr td{
 
 .login form {
     text-align: center;
-    
 }
 
 .login input[type="text"],
@@ -283,21 +283,6 @@ table tr td{
 
 .login a {
     color: red;
-}
-
-form {
-    background-color: #ffffff;
-    padding: 2%;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-form table {
-    width: 100%;
-}
-
-form table tr td {
-    padding: 10px;
 }
 
 /* CSS for input fields */

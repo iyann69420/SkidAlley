@@ -19,6 +19,18 @@ function checkIfExists($table, $column, $value)
     return false;
 }
 
+// Function to delete expired discounts
+function deleteExpiredDiscounts()
+{
+    global $conn;
+
+    $currentDateTime = date('Y-m-d H:i:s');
+    $query = "DELETE FROM discounts WHERE end_time < ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $currentDateTime);
+    $stmt->execute();
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
     // Get data from the form
     $discount_for = $_POST['discount_for'];
@@ -80,7 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
     }
 
     if ($stmt->execute()) {
-        // Successful insertion, you can redirect to a success page or show a success message
+        // Successful insertion, delete expired discounts
+        deleteExpiredDiscounts();
+
+        // Redirect to a success page or show a success message
         header("Location: discounts.php");
         exit();
     } else {
@@ -180,18 +195,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
                 <tr>
                     <td>Start Time:</td>
                     <td>
-                        <input type="date" name="start_time" placeholder="Enter start time">
+                        <input type="datetime-local" name="start_time" placeholder="Enter start time">
                     </td>
                 </tr>
                 <tr>
                     <td>End Time:</td>
                     <td>
-                        <input type="date" name="end_time" placeholder="Enter end time">
+                        <input type="datetime-local" name="end_time" placeholder="Enter end time">
                     </td>
                 </tr>
                 <tr>
                     <td colspan="2">
-                        <input type="submit" name="submit" value="Add Discount" class="btn-secondary">
+                        
+                    <input type="submit" name="submit" id="submitBtn" value="Add Discount" class="btn-secondary">
                     </td>
                 </tr>
             </table>
@@ -199,15 +215,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
     </div>
 </div>
 
-<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/themes/default.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
+
 <script>
-    document.getElementById('discount_for').addEventListener('change', function () {
+      document.getElementById('discount_for').addEventListener('change', function () {
         var selectedOption = this.value;
         document.getElementById('selected_option').value = selectedOption;
 
         document.getElementById('productDropdown').style.display = (selectedOption === 'product') ? 'table-row' : 'none';
         document.getElementById('brandDropdown').style.display = (selectedOption === 'brand') ? 'table-row' : 'none';
         document.getElementById('categoryDropdown').style.display = (selectedOption === 'category') ? 'table-row' : 'none';
+    });
+
+    document.getElementById('submitBtn').addEventListener('click', function (event) {
+        var discountPercentage = document.getElementsByName('discount_percentage')[0].value;
+        var startTime = document.getElementsByName('start_time')[0].value;
+        var endTime = document.getElementsByName('end_time')[0].value;
+
+        if (discountPercentage === '' || startTime === '' || endTime === '') {
+            event.preventDefault(); // Prevent form submission
+            alertify.error('Please fill in all required fields.');
+        }
     });
 </script>
 

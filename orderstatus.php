@@ -1,4 +1,5 @@
         <?php
+        $gcashReceiptUploaded = isset($_SESSION['gcashReceiptUploaded']) && $_SESSION['gcashReceiptUploaded'];
         include('partials-front/menu.php');
 
         if (!isset($_SESSION['userLoggedIn'])) {
@@ -12,6 +13,22 @@
         
             // Reset the session variable to avoid showing the message again on page refresh
             $_SESSION['reviewSubmitted'] = false;
+        }
+
+        if (isset($_SESSION['gcashReceiptUploaded']) && $_SESSION['gcashReceiptUploaded']) {
+            echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js'></script>";
+            echo "<script>alertify.success('Receipt uploaded successfully!');</script>";
+        
+            // Reset the session variable to avoid showing the message again on page refresh
+            $_SESSION['gcashReceiptUploaded'] = false;
+        }
+
+        if (isset($_SESSION['failed']) && $_SESSION['failed']) {
+            echo "<script src='https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js'></script>";
+            echo "<script>alertify.error('You already send a detail');</script>";
+        
+            // Reset the session variable to avoid showing the message again on page refresh
+            $_SESSION['failed'] = false;
         }
    
 
@@ -137,6 +154,7 @@
                                             <div class="col"> <strong>Shipping BY:</strong> <br> Skid Alley, | <i class="fa fa-phone"></i> +1598675986 </div>
                                             <div class="col status"> <strong>Status:</strong> <br><?php echo $statusTextValue ?> </div>
                                             <div class="col"> <strong>Total Amount:</strong> <br>₱<?php echo number_format($total_amount); ?> </div>
+                                            <div class="col"> <strong>Payment Details:</strong> <br><?php echo $paymentMethod ?> </div>
                                     </article>
 
 
@@ -244,51 +262,57 @@
                             
 
 
-
+ 
 
                             </ul>
                                     <hr>
                                     <?php 
-                                    if ($statusTextValue === 'Pending') {
-                                        $formButton = "<button type=\"button\" onclick=\"confirmCancelOrder($order_id)\" class=\"btn btn-warning\" data-abc=\"true\">Cancel Order</button>";
-
-                                        // Check if this order has a pending cancellation request
-                                        $checkCancellationSql = "SELECT * FROM admin_notifications WHERE order_id = $order_id AND is_approved = 0";
-                                        $cancellationResult = mysqli_query($conn, $checkCancellationSql);
-                                        if (mysqli_num_rows($cancellationResult) > 0) {
-                                            $formButton = "Cancellation Pending";
+                                   if ($statusTextValue === 'Pending') {
+                                    $formButton = "<button type=\"button\" onclick=\"confirmCancelOrder($order_id)\" class=\"btn btn-warning\" data-abc=\"true\">Cancel Order</button>";
+                                
+                                    // Check if this order has a pending cancellation request
+                                    $checkCancellationSql = "SELECT * FROM admin_notifications WHERE order_id = $order_id AND is_approved = 0";
+                                    $cancellationResult = mysqli_query($conn, $checkCancellationSql);
+                                
+                                    if (mysqli_num_rows($cancellationResult) > 0) {
+                                        $formButton = "Cancellation Pending";
+                                    }
+                                
+                                    // Render the form button based on the conditions
+                                    if (mysqli_num_rows($cancellationResult) <= 0) {
+                                        echo "<form method=\"post\" action=\"request-cancellation.php\" id=\"cancelOrderForm_$order_id\">";
+                                        echo "<input type=\"hidden\" name=\"order_id\" value=\"$order_id\">";
+                                        echo "<input type=\"hidden\" name=\"order_products_id\" value=\"" . (isset($productRow['order_products_id']) ? $productRow['order_products_id'] : '') . "\">";
+                                        echo "<input type=\"hidden\" name=\"reason\" id=\"reasonInput_$order_id\">";
+                                        echo $formButton;
+                                        echo "</form>";
+                                
+                                        // Add the button specifically for Gcash payment
+                                        if ($paymentMethod === 'Gcash') {
+                                            echo "<button type=\"button\" onclick=\"uploadGcashReceipt($order_id)\" class=\"btn btn-success\">Upload Gcash Receipt</button>";
                                         }
-
-                                        // Render the form button based on the conditions
-                                        if (mysqli_num_rows($cancellationResult) <= 0) {
-                                            echo "<form method=\"post\" action=\"request-cancellation.php\" id=\"cancelOrderForm_$order_id\">";
-                                            echo "<input type=\"hidden\" name=\"order_id\" value=\"$order_id\">";
-                                            echo "<input type=\"hidden\" name=\"order_products_id\" value=\"" . (isset($productRow['order_products_id']) ? $productRow['order_products_id'] : '') . "\">";
-                                            echo "<input type=\"hidden\" name=\"reason\" id=\"reasonInput_$order_id\">";
-                                            echo $formButton;
-                                            echo "</form>";
+                                    } else {
+                                        echo $formButton;
+                                    }
+                                } 
+                                
+                                if ($statusTextValue === 'Delivered') {
+                                    if ($row['order_receive'] == 0) {
+                                        // If the order has not been received
+                                        echo "<button type=\"button\" onclick=\"confirmOrderReceived($order_id)\" class=\"btn btn-primary\" data-abc=\"true\">Order Received</button>";
+                                    } else {
+                                        // If the order has been received, check if there is a review for this order
+                                        $checkReviewSql = "SELECT * FROM reviews WHERE order_id = $order_id";
+                                        $reviewResult = mysqli_query($conn, $checkReviewSql);
+                                
+                                        if (mysqli_num_rows($reviewResult) > 0) {
+                                            echo "<p>Product reviewed</p>";
                                         } else {
-                                            echo $formButton;
-                                        }
-                                    } 
-
-                                    if ($statusTextValue === 'Delivered') {
-                                        if ($row['order_receive'] == 0) {
-                                            // If the order has not been received
-                                            echo "<button type=\"button\" onclick=\"confirmOrderReceived($order_id)\" class=\"btn btn-primary\" data-abc=\"true\">Order Received</button>";
-                                        } else {
-                                            // If the order has been received, check if there is a review for this order
-                                            $checkReviewSql = "SELECT * FROM reviews WHERE order_id = $order_id";
-                                            $reviewResult = mysqli_query($conn, $checkReviewSql);
-                                    
-                                            if (mysqli_num_rows($reviewResult) > 0) {
-                                                echo "<p>Product reviewed</p>";
-                                            } else {
-                                                // If there is no review, change the button to review product
-                                                echo "<button type=\"button\" onclick=\"redirectToReviewPage($order_id)\" class=\"btn btn-success\" data-abc=\"true\">Review Product</button>";
-                                            }
+                                            // If there is no review, change the button to review product
+                                            echo "<button type=\"button\" onclick=\"redirectToReviewPage($order_id)\" class=\"btn btn-success\" data-abc=\"true\">Review Product</button>";
                                         }
                                     }
+                                }
                                     ?>
                                 </div>
                             </article>
@@ -325,71 +349,98 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/themes/default.min.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
 
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+
+    
+   
+
+
+
+
+
+
         <script defer>
-    function confirmCancelOrder(orderId) {
-        alertify.prompt('Please provide a reason for cancellation', '', function (evt, value) {
-            if (value.trim() === '') {
-                alertify.error('Please provide a reason for cancellation.');
-            } else {
-                let reasonInput = document.getElementById(`reasonInput_${orderId}`);
-                let cancelOrderForm = document.getElementById(`cancelOrderForm_${orderId}`);
-                if (reasonInput && cancelOrderForm) {
-                    reasonInput.value = value;
-                    cancelOrderForm.submit();
-                } else {
-                    alertify.error('An error occurred while processing your request.');
-                }
-            }
-        }, function () {
-            // User clicked cancel for providing a reason
-        });
-    }
 
-    function redirectToReviewPage(orderId) {
-        // Assuming the review page is named 'review.php'
-        // You can replace this with the actual URL of your review page
-        let reviewPageURL = 'review.php?order_id=' + orderId;
-        window.location.href = reviewPageURL;
-    }
+        
+        function uploadGcashReceipt(orderId) {
+            // Assuming you have a PHP script to handle the receipt upload, replace 'upload-receipt.php' with the actual script
+            let uploadURL = 'upload-receipt.php?order_id=' + orderId;
 
-    function confirmOrderReceived(orderId) {
-    // Display a confirmation dialog using Alertify.js
-    alertify.confirm('Confirm Order Received', 'Have you received your order?', 
-        function () {
-            // User clicked 'OK'
-            // Assuming you have a PHP script to handle the update, replace 'update-order-received.php' with the actual script
-            let updateURL = 'update-order-received.php?order_id=' + orderId;
-
-            // Use AJAX to send a request to the server
-            let xhr = new XMLHttpRequest();
-            xhr.open('GET', updateURL, true);
-
-            // Set up a callback function to handle the response
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    // Update the button text or perform any other action
-                    alertify.success('Order Received successfully updated.');
-                    // Optionally, you can reload the page or update the UI as needed
-                    location.reload();
-                } else {
-                    alertify.error('Error updating order status.');
-                }
-            };
-
-            // Set up a callback function to handle errors
-            xhr.onerror = function () {
-                alertify.error('An error occurred while processing your request.');
-            };
-
-            // Send the AJAX request
-            xhr.send();
-        },
-        function () {
-            // User clicked 'Cancel'
-            // Do nothing or provide any additional action if needed
+            // Redirect the user to the upload receipt page
+            window.location.href = uploadURL;
         }
-    );
-}
+
+
+
+
+
+
+
+        function confirmCancelOrder(orderId) {
+            alertify.prompt('Please provide a reason for cancellation', '', function (evt, value) {
+                if (value.trim() === '') {
+                    alertify.error('Please provide a reason for cancellation.');
+                } else {
+                    let reasonInput = document.getElementById(`reasonInput_${orderId}`);
+                    let cancelOrderForm = document.getElementById(`cancelOrderForm_${orderId}`);
+                    if (reasonInput && cancelOrderForm) {
+                        reasonInput.value = value;
+                        cancelOrderForm.submit();
+                    } else {
+                        alertify.error('An error occurred while processing your request.');
+                    }
+                }
+            }, function () {
+                // User clicked cancel for providing a reason
+            });
+        }
+
+        function redirectToReviewPage(orderId) {
+            // Assuming the review page is named 'review.php'
+            // You can replace this with the actual URL of your review page
+            let reviewPageURL = 'review.php?order_id=' + orderId;
+            window.location.href = reviewPageURL;
+        }
+
+        function confirmOrderReceived(orderId) {
+        // Display a confirmation dialog using Alertify.js
+        alertify.confirm('Confirm Order Received', 'Have you received your order?', 
+            function () {
+                // User clicked 'OK'
+                // Assuming you have a PHP script to handle the update, replace 'update-order-received.php' with the actual script
+                let updateURL = 'update-order-received.php?order_id=' + orderId;
+
+                // Use AJAX to send a request to the server
+                let xhr = new XMLHttpRequest();
+                xhr.open('GET', updateURL, true);
+
+                // Set up a callback function to handle the response
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        // Update the button text or perform any other action
+                        alertify.success('Order Received successfully updated.');
+                        // Optionally, you can reload the page or update the UI as needed
+                        location.reload();
+                    } else {
+                        alertify.error('Error updating order status.');
+                    }
+                };
+
+                // Set up a callback function to handle errors
+                xhr.onerror = function () {
+                    alertify.error('An error occurred while processing your request.');
+                };
+
+                // Send the AJAX request
+                xhr.send();
+            },
+            function () {
+                // User clicked 'Cancel'
+                // Do nothing or provide any additional action if needed
+            }
+        );
+    }
 
 
     function filterOrders(status) {

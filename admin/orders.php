@@ -100,6 +100,7 @@
             ?>
         </table>
     </div>
+    <br><br><br>
 </div>
 
 <?php include('partials/footer.php'); ?>

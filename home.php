@@ -44,92 +44,138 @@
     <script src="scripts/carousel.js"></script>
 
     <div class="bikeset-section">
-    <h2>Bike Set</h2>
+        <h2>Bike Set</h2>
+            <br><br>
+            <div class="bikeset-products">
+                <?php
+                // Define the category name for "Bike Set"
+                $bikesetCategoryName = "Bike Set"; // Replace with the actual category name
+
+                // Retrieve the category ID for "Bike Set" from the categories table
+                $sqlCategory = "SELECT id FROM categories WHERE category = '$bikesetCategoryName'";
+                $resCategory = mysqli_query($conn, $sqlCategory);
+
+                if ($resCategory && mysqli_num_rows($resCategory) > 0) {
+                    $categoryRow = mysqli_fetch_assoc($resCategory);
+                    $bikesetCategoryId = $categoryRow['id'];
+
+                    // Your SQL query to select products only in the "Bike Set" category
+                    $sql = "SELECT * FROM product_list WHERE category_id = $bikesetCategoryId";
+                    $res = mysqli_query($conn, $sql);
+
+                    if ($res && mysqli_num_rows($res) > 0) {
+                        while ($bikeset_product = mysqli_fetch_assoc($res)) {
+                            ?>  <div class="bikeset-product">
+                            <a href="product-details.php?id=<?php echo $bikeset_product['id']; ?>">
+                                <img src="<?php echo SITEURL; ?>images/bike/<?php echo $bikeset_product['image_path']; ?>"
+                                        alt="<?php echo $bikeset_product['name']; ?>"
+                                        style="width: 150px;">
+                                <h3><?php echo $bikeset_product['name']; ?></h3>
+                                <p>Price: <?php echo number_format($bikeset_product['price'], 2); ?></p>
+                                
+                            </a>
+                        </div>
+                        <?php
+                        }
+                    } else {
+                        echo "<p>No BikeSet products available.</p>";
+                    }
+                } else {
+                    echo "<p>'Bike Set' category not found.</p>";
+                }
+
+                ?>
+
+                    
+            </div>
+    </div>
+
+    <?php
+$currentTime = date('Y-m-d H:i:s');
+$discountedProductsSql = "SELECT pl.*, d.discount_percentage
+                        FROM product_list pl
+                        JOIN discounts d ON pl.id = d.product_id
+                        WHERE d.discount_percentage > 0
+                          AND (d.end_time IS NULL OR d.end_time >= '$currentTime')";
+$discountedProductsResult = mysqli_query($conn, $discountedProductsSql);
+?>
+
+<div class="discounted-section" <?php echo ($discountedProductsResult && mysqli_num_rows($discountedProductsResult) > 0) ? '' : 'style="display: none;"'; ?>>
+    <h2>Discounted Products</h2>
     <br><br>
-    <div class="bikeset-products">
+    <div class="discounted-products">
         <?php
-        // Define the category name for "Bike Set"
-        $bikesetCategoryName = "Bike Set"; // Replace with the actual category name
-
-        // Retrieve the category ID for "Bike Set" from the categories table
-        $sqlCategory = "SELECT id FROM categories WHERE category = '$bikesetCategoryName'";
-        $resCategory = mysqli_query($conn, $sqlCategory);
-
-        if ($resCategory && mysqli_num_rows($resCategory) > 0) {
-            $categoryRow = mysqli_fetch_assoc($resCategory);
-            $bikesetCategoryId = $categoryRow['id'];
-
-            // Your SQL query to select products only in the "Bike Set" category
-            $sql = "SELECT * FROM product_list WHERE category_id = $bikesetCategoryId";
-            $res = mysqli_query($conn, $sql);
-
-            if ($res && mysqli_num_rows($res) > 0) {
-                while ($bikeset_product = mysqli_fetch_assoc($res)) {
-                  ?>  <div class="bikeset-product">
-                    <a href="product-details.php?id=<?php echo $bikeset_product['id']; ?>">
-                        <img src="<?php echo SITEURL; ?>images/bike/<?php echo $bikeset_product['image_path']; ?>"
-                             alt="<?php echo $bikeset_product['name']; ?>"
-                             style="width: 150px;">
-                        <h3><?php echo $bikeset_product['name']; ?></h3>
-                        <p>Price: <?php echo $bikeset_product['price']; ?></p>
-                        
+        if ($discountedProductsResult && mysqli_num_rows($discountedProductsResult) > 0) {
+            while ($discountedProduct = mysqli_fetch_assoc($discountedProductsResult)) {
+                $price = $discountedProduct['price'];
+                $discountPercentage = $discountedProduct['discount_percentage'];
+                $discountedPrice = $price - ($price * $discountPercentage / 100);
+        ?>
+                <div class="discounted-product">
+                    <a href="product-details.php?id=<?php echo $discountedProduct['id']; ?>">
+                        <img src="<?php echo SITEURL; ?>images/bike/<?php echo $discountedProduct['image_path']; ?>"
+                            alt="<?php echo $discountedProduct['name']; ?>"
+                            style="width: 150px;">
+                        <h3><?php echo $discountedProduct['name']; ?></h3>
+                        <?php
+                        if (!empty($discountPercentage) && $discountPercentage > 0) {
+                            echo "<p class='price'>Price: ₱<span class='original-price'>" . number_format($price) . "</span></p>";
+                            echo "<p class='discounted-price'>Discounted Price: ₱" . number_format($discountedPrice) . "</p>";
+                        } else {
+                            echo "<p class='price'>Price: ₱" . number_format($price) . "</p>";
+                        }
+                        ?>
                     </a>
                 </div>
-                <?php
-                }
-            } else {
-                echo "<p>No BikeSet products available.</p>";
+        <?php
             }
         } else {
-            echo "<p>'Bike Set' category not found.</p>";
+            echo "<p>No discounted products available.</p>";
         }
-
         ?>
-
-         
     </div>
 </div>
 
 
-<div class="filter-price">
-    <h2>Filter</h2>
-    <form action="filter-price.php" method="GET">
-        <label for="category">Category:</label>
-        <select name="category_id" id="category_id">
-                            <?php
-                            $sql = "SELECT DISTINCT category_id FROM category_brands";
-                            $res = mysqli_query($conn, $sql);
-                            $count = mysqli_num_rows($res);
+    <div class="filter-price">
+        <h2>Filter</h2>
+        <form action="filter-price.php" method="GET">
+            <label for="category">Category:</label>
+            <select name="category_id" id="category_id">
+                                <?php
+                                $sql = "SELECT DISTINCT category_id FROM category_brands";
+                                $res = mysqli_query($conn, $sql);
+                                $count = mysqli_num_rows($res);
 
-                            if ($count > 0) {
-                                while ($row = mysqli_fetch_assoc($res)) {
-                                    $category_id = $row['category_id'];
-                                    $category_sql = "SELECT * FROM categories WHERE id='$category_id' AND status='1'";
-                                    $category_res = mysqli_query($conn, $category_sql);
-                                    $category_row = mysqli_fetch_assoc($category_res);
-                                    if ($category_row) {
-                                        $title = $category_row['category'];
-                                        echo '<option value="' . $category_id . '">' . $title . '</option>';
+                                if ($count > 0) {
+                                    while ($row = mysqli_fetch_assoc($res)) {
+                                        $category_id = $row['category_id'];
+                                        $category_sql = "SELECT * FROM categories WHERE id='$category_id' AND status='1'";
+                                        $category_res = mysqli_query($conn, $category_sql);
+                                        $category_row = mysqli_fetch_assoc($category_res);
+                                        if ($category_row) {
+                                            $title = $category_row['category'];
+                                            echo '<option value="' . $category_id . '">' . $title . '</option>';
+                                        }
                                     }
+                                } else {
+                                    echo '<option value="0">No Category Found</option>';
                                 }
-                            } else {
-                                echo '<option value="0">No Category Found</option>';
-                            }
-                            ?>
-                        </select>
+                                ?>
+                            </select>
 
-        <label for="brand">Brand:</label>
-            <select name="brand" id="brand">
-                <option value="">Select a category first</option>
-            </select>
+            <label for="brand">Brand:</label>
+                <select name="brand" id="brand">
+                    <option value="">Select a category first</option>
+                </select>
 
-            <label for="min-price">Min Price:</label>
-<input type="number" name="min-price" id="min-price" value="0">
-<label for="max-price">Max Price:</label>
-<input type="number" name="max-price" id="max-price">
-<input type="submit" value="Filter">
-    </form>
-</div>
+                <label for="min-price">Min Price:</label>
+                <input type="number" name="min-price" id="min-price" value="0">
+                <label for="max-price">Max Price:</label>
+                <input type="number" name="max-price" id="max-price">
+                <input type="submit" value="Filter">
+        </form>
+    </div>
 
 </body>
 </html>

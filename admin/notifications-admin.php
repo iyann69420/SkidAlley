@@ -9,110 +9,129 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <style>
-.main-content {
-  width: 80%;
-  margin: 0 auto;
-  padding: 20px;
-  
-}
+    .main-content {
+        width: 80%;
+        margin: 0 auto;
+        padding: 20px;
+    }
 
-.wrapper {
-  padding: 20px;
-}
+    .wrapper {
+        padding: 20px;
+    }
 
-.notifications {
-  list-style: none;
-  padding: 0;
-}
+    .notifications {
+        list-style: none;
+        padding: 0;
+    }
 
-.notification-item {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-.notification-item.unseen {
-        border: 1px solid red; 
-}
+    .notification-item {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
 
+    .notification-item.unseen {
+        border: 1px solid red;
+    }
 
-.notification-item h3 {
-  margin: 0 0 10px;
-  font-size: 22px;
-  color: #333;
-}
+    .notification-item h3 {
+        margin: 0 0 10px;
+        font-size: 22px;
+        color: #333;
+    }
 
-.notification-item p {
-  margin: 0 0 10px;
-  color: #666;
-  font-size: 16px;
-}
+    .notification-item p {
+        margin: 0 0 10px;
+        color: #666;
+        font-size: 16px;
+    }
 
-.notification-date {
-  display: block;
-  color: #999;
-  font-size: 14px;
-}
+    .notification-date {
+        display: block;
+        color: #999;
+        font-size: 14px;
+    }
+    .view-order-button {
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  }
+
+  .view-order-button:hover {
+    background-color: orange;
+  }
 </style>
 <div class="main-content">
     <div class="wrapper">
         <h1>Notifications</h1>
         <br>
         <?php
-          // Assuming you have already established the database connection elsewhere
-          $notificationSql = "SELECT * FROM admin_notifications ORDER BY timestamp DESC";
-          $notificationResult = mysqli_query($conn, $notificationSql);
+        
 
-          if (mysqli_num_rows($notificationResult) > 0) {
-              // Loop through the notifications and display them
-              while ($row = mysqli_fetch_assoc($notificationResult)) {
-                  $notificationId = $row['id'];
-                  $message = $row['order_id'];
-                  $reason = $row['reason'];
-                  $timestamp = $row['timestamp'];
-                  $order_id = $row['order_id'];
-                  $isRead = $row['is_read'];
-                  $isApproved = $row['is_approved'];
+        $notificationSql = "SELECT * FROM admin_notifications ORDER BY timestamp DESC";
+        $notificationResult = mysqli_query($conn, $notificationSql);
 
-                  $notificationClass = $isRead ? 'notification-item' : 'notification-item unseen';
+        if ($notificationResult) {
+            if (mysqli_num_rows($notificationResult) > 0) {
+                while ($row = mysqli_fetch_assoc($notificationResult)) {
+                    $notificationId = $row['id'];
+                    $message = $row['order_id'];
+                    $reason = $row['reason'];
+                    $timestamp = $row['timestamp'];
+                    $order_id = $row['order_id'];
+                    $isRead = $row['is_read'];
+                    $isApproved = $row['is_approved'];
 
-                  // Check the value of is_approved to determine the type of notification
-                  if ($isApproved == 0) {
-                      // Display notification for canceled order
-                      $notificationType = "Cancellation of Order";
-                  } elseif ($isApproved == 1) {
-                      // Display notification for purchase order
-                      $notificationType = "Purchase Order";
-                  } elseif ($isApproved == 2){
-                    $notificationType = "Order Receive";
-                  }
-                   else {
-                      // Handle other cases or skip the iteration
-                      continue;
-                  }
-          ?>
-                  <div class="notifications">
-                    <div class="<?php echo $notificationClass; ?>" onclick="showAlertify('<?php echo $message; ?>', '<?php echo $reason; ?>', '<?php echo $timestamp; ?>', '<?php echo $order_id; ?>', '<?php echo $notificationId; ?>', '<?php echo $isApproved; ?>')">
-                        <h3><?php echo $notificationType; ?></h3>
-                        <?php if ($isApproved == 0) : ?>
-                            <p>There is a cancelled order. The reason is: <strong><?php echo $reason; ?></strong></p>
-                        <?php elseif ($isApproved == 1) : ?>
-                            <p>There is a purchase order. <strong></strong></p>
-                        <?php endif; ?>
-                        <span class="notification-date"><?php echo $timestamp; ?></span>
+                    $notificationClass = $isRead ? 'notification-item' : 'notification-item unseen';
+
+                    if ($isApproved == 0) {
+                        $notificationType = "Cancellation of Order";
+                    } elseif ($isApproved == 1) {
+                        $notificationType = "Purchase Order";
+                    } elseif ($isApproved == 2) {
+                        $notificationType = "Order Received";
+                    } elseif ($isApproved == 3) {
+                        $notificationType = "Confirming Payment";
+                    } else {
+                        continue;
+                    }
+                    ?>
+                    <div class="notifications">
+                        <div class="<?php echo $notificationClass; ?>"
+                             onclick="showAlertify('<?php echo $message; ?>', '<?php echo $reason; ?>', '<?php echo $timestamp; ?>', '<?php echo $order_id; ?>', '<?php echo $notificationId; ?>', '<?php echo $isApproved; ?>')">
+                            <h3><?php echo $notificationType; ?></h3>
+                            <?php if ($isApproved == 0) : ?>
+                                <p>There is a cancelled order. The reason is: <strong><?php echo $reason; ?></strong></p>
+                            <?php elseif ($isApproved == 1) : ?>
+                                <p>There is a purchase order.</p>
+                            <?php elseif ($isApproved == 2) : ?>
+                                <p>Order has been received.</p>
+                            <?php elseif ($isApproved == 3) : ?>
+                                <p>Confirming payment for order: <strong><?php echo $order_id; ?></strong></p>
+                            <?php endif; ?>
+                            <span class="notification-date"><?php echo $timestamp; ?></span>
+                        </div>
                     </div>
-                </div>
-          <?php
-              }
-          } else {
-              echo "<p>No notifications found.</p>";
-          }
-          ?>
+                    <?php
+                }
+            } else {
+                echo "<p>No notifications found.</p>";
+            }
+        } else {
+            echo "Error executing the query: " . mysqli_error($conn);
+        }
+
+        // Close the database connection
+        mysqli_close($conn);
+        ?>
     </div>
 </div>
-
-
 
 <audio id="notificationSound" src="/SkidAlley/audio/notification.mp3"></audio>
 
@@ -128,7 +147,15 @@ function showAlertify(message, reason, timestamp, order_id, notification_id, isA
     // Change the tab name
     document.title = 'New Notification - ' + notificationType;
 
-    alertify.alert(notificationType, getMessageText(isApproved, reason) + '<br><br>' + timestamp + '<br><br><button onclick="redirectToOrder(' + order_id + ')">View Order</button>', function () {
+    alertify.alert(
+    notificationType,
+    getMessageText(isApproved, reason) +
+        '<br><br>' +
+        timestamp +
+        '<br><br><button class="view-order-button" onclick="redirectToOrder(' +
+        order_id +
+        ')">View Order</button>',
+    function () {
         // This function is called after the user clicks the "OK" button in the alertify dialog
         markNotificationAsRead(notification_id);
 
@@ -137,7 +164,8 @@ function showAlertify(message, reason, timestamp, order_id, notification_id, isA
 
         // Reload the page to reflect the updated "is_read" status
         window.location.reload();
-    });
+    }
+);
 }
 
 
@@ -148,6 +176,8 @@ function showAlertify(message, reason, timestamp, order_id, notification_id, isA
       return 'There is a purchase order.';
     } else if (isApproved == 2){
       return 'Order has been recieve.';
+    } else if (isApproved == 3){
+      return 'Confirming Payment';
     } 
     else {
       return ''; // Handle other cases if needed
