@@ -1,10 +1,7 @@
 /*INDEX.HTML*/
 
 
-@font-face {
-    font-family: 'Gill Sans MT' ;
-    src: url('fonts/Gill\ Sans\ MT/');
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @media screen and (max-width: 768px) {
   
 }
@@ -18,8 +15,8 @@
 * {
     padding: 0px;
     margin: 0px;
-    font-family: 'Gill Sans MT';
-    font-weight:bolder;
+    font-family: 'Montserrat', sans-serif;;
+
 
 }
 
@@ -990,28 +987,104 @@ cursor: pointer;
 
 /*notifications page*/
 
-.notification {
+.content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+.notification-container {
     background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+        max-width: 1300px; /* Adjust the maximum width as needed */
+        border-radius: 20px; /* Adjust the border radius as needed */
+        overflow: hidden;
+}
+
+.notification {
+    width: 100%;
+    max-width: 600px; /* Adjust the maximum width as needed */
+    background-color: #fff;
     border: 1px solid #ccc;
     padding: 1rem;
     margin-bottom: 1rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
 .notification-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 0.5rem;
 }
 
 .notification h2 {
-    margin: 0;
+margin: 0;
 }
 
 .notification p {
-    margin: 0;
+margin: 0;
 }
+.ajs-button.ajs-ok {
+background-color: black !important;
+color: white !important;
+}
+
+.ajs-button.ajs-ok:hover {
+background-color: orange !important;
+color: black !important;
+}
+.ajs-button.ajs-ok, .ajs-button.ajs-cancel {
+background-color: black !important;
+color: white !important;
+}
+
+.ajs-button.ajs-ok:hover, .ajs-button.ajs-cancel:hover {
+background-color: orange !important;
+color: black !important;
+}
+.view-orders-button {
+padding: 10px 20px;
+background-color: black;
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+transition: color 0.3s;
+}
+
+.view-orders-button:hover {
+color: orange;
+}
+
+.notification:hover {
+background-color: #f9f9f9;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.delete-button {
+background: none;
+border: none;
+}
+
+.delete-button:hover {
+color: darkred;
+transform: scale(1.1); /* Optional: to provide a slight scale effect on hover */
+}
+.notification.unread {
+border-left: 5px solid #ff9800; /* Choose the color you want for unread notifications */
+}
+
+
 
 /* carousel */
 .carousel {
@@ -1329,7 +1402,8 @@ p {
     color: #ffffff;
     background-color: black;
     border-color: black;
-    border-radius: 1px;
+    border-radius: 5px;
+    
 }
 
 /* Change styles on hover */

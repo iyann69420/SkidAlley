@@ -1,5 +1,9 @@
 <?php
 include ('./config/constants.php');
+if (!isset($_SESSION['userLoggedIn'])) {
+    header("Location: login.php");
+    exit();
+}
 
 if (isset($_GET['categoryId'])) {
     // Sanitize the input to prevent SQL injection

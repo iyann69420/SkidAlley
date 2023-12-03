@@ -83,6 +83,7 @@ include ('login-check.php');
                     <li><a href="aboutus.php">About Us</a></li>
                     <li><a href="contactus.php">Contact Us</a></li>
                     <li><a href="carousel.php">Carousel(Home)</a></li>
+                    <li><a href="gcash-info.php">Gcash Info</a></li>
                 </ul>
             </li>
             <?php } ?>

@@ -1,7 +1,7 @@
 <?php include('partials-front/menu.php'); ?>
 
-<br><br><br><br><br><br><br><br>
-
+<br><br><br><br><br>
+<div class="content-container">
 <?php 
 if (!isset($_SESSION['userLoggedIn'])) {
     header("Location: login.php");
@@ -15,61 +15,14 @@ if (!isset($_SESSION['userLoggedIn'])) {
 
 <script src="https://cdn.jsdelivr.net/npm/alertifyjs/build/alertify.min.js"></script>
 <style>
-.ajs-button.ajs-ok {
-    background-color: black !important;
-    color: white !important;
-}
-
-.ajs-button.ajs-ok:hover {
-    background-color: orange !important;
-    color: black !important;
-}
-.ajs-button.ajs-ok, .ajs-button.ajs-cancel {
-    background-color: black !important;
-    color: white !important;
-}
-
-.ajs-button.ajs-ok:hover, .ajs-button.ajs-cancel:hover {
-    background-color: orange !important;
-    color: black !important;
-}
-.view-orders-button {
-    padding: 10px 20px;
-    background-color: black;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: color 0.3s;
-}
-
-.view-orders-button:hover {
-    color: orange;
-}
-
-.notification:hover {
-    background-color: #f9f9f9;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     
-}
-
-.delete-button {
-    background: none;
-    border: none;
-}
-
-.delete-button:hover {
-    color: darkred;
-    transform: scale(1.1); /* Optional: to provide a slight scale effect on hover */
-}
-.notification.unread {
-    border-left: 5px solid #ff9800; /* Choose the color you want for unread notifications */
-}
+  
     
 </style>
 <body>
     <header>
         <h1>Notification </h1>
+        <br>
     </header>
     
     <main>
@@ -106,11 +59,13 @@ if (!isset($_SESSION['userLoggedIn'])) {
                 <?php
             }
         } else {
-            echo "<p>No notifications found.</p>";
+            echo "<p style='font-size: 24px; color: red;'>No notifications found.</p>";
+
         }
         ?>
     </div>
     </main>
+    </div>
 
     <script>
      function showNotification(message, type, notificationId) {
@@ -134,7 +89,7 @@ if (!isset($_SESSION['userLoggedIn'])) {
                         // Callback function when the Cancel button is clicked
                         location.reload(); // Reload the page after the Alertify dialog is closed
                     })
-                    .set('labels', { ok: 'Mark as Read', cancel: 'Cancel' })
+                    .set('labels', { ok: 'Ok', cancel: 'Cancel' })
                     .set('defaultFocus', 'cancel');
             } else {
                 console.error(xhr.responseText);

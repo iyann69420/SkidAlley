@@ -1,6 +1,11 @@
 <?php
 include ('./config/constants.php');
 
+if (!isset($_SESSION['userLoggedIn'])) {
+    header("Location: login.php");
+    exit();
+}
+
 if (isset($_GET['order_id'])) {
     $orderId = $_GET['order_id'];
 
@@ -159,14 +164,31 @@ if (isset($_GET['order_id'])) {
         <div class="column">
             <p>Payment Method: <strong><?php echo $paymentMethod; ?></strong></p>
         </div>
-
+        
         <div class="column">
-            <p>G Cash Name: <strong>Skid Alley</strong></p>
+            <?php 
+            $gcashSql = "SELECT * FROM gcash_infos";
+            $gcashRes = mysqli_query($conn, $gcashSql);
+            $gcashCount = mysqli_num_rows($gcashRes);
+
+            if ($gcashCount > 0) {
+                while ($gcashRow = mysqli_fetch_assoc($gcashRes)) {
+                    $name = $gcashRow['name'];
+                    $number = $gcashRow['number'];
+                    ?>
+
+            
+            <p>G Cash Name: <strong><?php echo $name?></strong></p>
         </div>
 
         <div class="column">
-            <p>Number: <strong>01201021020</strong></p>
+            <p>Number: <strong><?php echo $number?></strong></p>
         </div>
+
+        <?php
+            }
+        }
+        ?>
 
         <form action="upload-receipt.php?order_id=<?php echo $orderId; ?>" method="post" enctype="multipart/form-data">
             <!-- Add your existing form fields here -->

@@ -335,6 +335,13 @@ if (isset($_POST['checkout'])) {
             }
         }
 
+        // Step 5: Clear the user's cart
+        $clearCartSql = "DELETE FROM cart_list WHERE client_id = $userId";
+        mysqli_query($conn, $clearCartSql);
+
+        // Step 6: Commit the changes
+        mysqli_commit($conn);
+
         // Step 4: Commit the changes
         mysqli_commit($conn);
         $id = $orderId;
@@ -467,9 +474,10 @@ if (isset($_POST['checkout'])) {
         echo "Error inserting order record: " . mysqli_error($conn);
     }
 
-    // Step 5: Clear the user's cart
-    // $clearCartSql = "DELETE FROM cart_list WHERE client_id = $userId";
-    // mysqli_query($conn, $clearCartSql);
+    //Step 5: Clear the user's cart
+
+    $clearCartSql = "DELETE FROM cart_list WHERE client_id = $userId";
+    mysqli_query($conn, $clearCartSql);
 }
 
 ?>

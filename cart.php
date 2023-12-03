@@ -6,7 +6,7 @@ if (!isset($_SESSION['userLoggedIn'])) {
     exit();
 }
 ?>
-<br><br><br><br><br><br><br><br>
+<br><br><br><br><br>
 <body style="text-align: center"; >
 
 <?php
@@ -126,7 +126,9 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
                 $totalPrice += $product_total; // Add product total to the total price
             }
         } else {
-            echo "<tr> <td colspan='9' class='error'> No cart added. </td>  </tr>";
+            echo "<tr> <td colspan='9' class='error' style='font-size: 32px; color: red;'> No cart added. </td> </tr>";
+
+
         }
         ?>
         <tr>
@@ -313,5 +315,5 @@ var deleteMessage = localStorage.getItem('deleteMessage');
 
 
 </script>
-<br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 <?php include('partials-front/footer.php'); ?>

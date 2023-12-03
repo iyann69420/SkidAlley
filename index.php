@@ -197,5 +197,5 @@
 </body>
 
 </html>
-<br><br><br><br>
+<br><br><br><br><br><br><br><br>
 <?php include('partials-front/footer.php'); ?>

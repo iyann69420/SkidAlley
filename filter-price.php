@@ -1,5 +1,9 @@
 <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-<?php include('partials-front/menu.php'); ?>
+<?php include('partials-front/menu.php');
+if (!isset($_SESSION['userLoggedIn'])) {
+    header("Location: login.php");
+    exit();
+} ?>
 <style>
 .filtered-product-container {
     display: grid;
@@ -74,13 +78,16 @@ if (isset($_GET['min-price']) && isset($_GET['max-price'])) {
                     <h3><?= $product['name'] ?></h3>
                     <p>Price: <?= $product['price'] ?></p>
                 </a>
+                
             </div>
+            <br><br><br><br><br><br><br><br><br><br><br><br>
             <?php
         }
     } else {
         echo "<p>No products available within the specified criteria.</p>";
     }
 }
+
 ?>
 <?php include('partials-front/footer.php');?>
 

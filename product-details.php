@@ -66,6 +66,39 @@
     border-radius: 8px;
     margin-top: 15px;
     }
+
+    .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    padding-top: 50px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.9);
+}
+
+/* Style for the modal content */
+.modal-content {
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 700px;
+}
+
+/* Style for the close button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
 </style>
 <?php include('partials-front/menu.php'); ?>
 <br><br><br><br><br><br><br>
@@ -561,8 +594,14 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
                     <!-- Image Section -->
                     <img src="<?php echo SITEURL; ?>images/reviews/<?php echo $review['image_path']; ?>"
-                            alt="Reviewer Image"
-                            class="review-image">
+                        alt="Reviewer Image"
+                        class="review-image"
+                        onclick="openModal()">
+
+                        <div id="reviewModal" class="modal">
+                        <span class="close" onclick="closeModal()">&times;</span>
+                        <img id="reviewimage" class="modal-content">
+                    </div>
 
                     <!-- Color and Size Section -->
                     <div class="color-size">
@@ -587,6 +626,21 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     </div>
 
     <script>
+
+        function openModal() {
+            var reviewImage = document.getElementById('reviewimage');
+            var modal = document.getElementById('reviewModal');
+
+            // Set the modal content to the clicked image source
+            reviewImage.src = event.target.src;
+
+            // Display the modal
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('reviewModal').style.display = 'none';
+        }
         // Add event listeners to dropdowns for automatic form submission
         const filterForm = document.getElementById('filter-form');
         const dropdowns = document.querySelectorAll('select');

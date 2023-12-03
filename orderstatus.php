@@ -151,7 +151,25 @@
                                         echo $deliveryDate;
                                         ?>
                                     </div>
-                                            <div class="col"> <strong>Shipping BY:</strong> <br> Skid Alley, | <i class="fa fa-phone"></i> +1598675986 </div>
+                                    <div class="col">
+                                        <?php  
+                                        $gcashSql = "SELECT * FROM gcash_infos";
+                                        $gcashRes = mysqli_query($conn, $gcashSql);
+                                        $gcashCount = mysqli_num_rows($gcashRes);
+                                        
+                                        if ($gcashCount > 0) {
+                                            while ($gcashRow = mysqli_fetch_assoc($gcashRes)) {
+                                                $name = $gcashRow['name'];
+                                                $number = $gcashRow['number'];
+                                                ?>
+                                                <strong>Shipping BY:</strong> <br>
+                                                <?php echo $name; ?> | <i class="fa fa-phone"></i> <?php echo $number; ?>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+
                                             <div class="col status"> <strong>Status:</strong> <br><?php echo $statusTextValue ?> </div>
                                             <div class="col"> <strong>Total Amount:</strong> <br>₱<?php echo number_format($total_amount); ?> </div>
                                             <div class="col"> <strong>Payment Details:</strong> <br><?php echo $paymentMethod ?> </div>
@@ -288,9 +306,37 @@
                                         echo "</form>";
                                 
                                         // Add the button specifically for Gcash payment
+                                        // Add the button specifically for Gcash payment
                                         if ($paymentMethod === 'Gcash') {
-                                            echo "<button type=\"button\" onclick=\"uploadGcashReceipt($order_id)\" class=\"btn btn-success\">Upload Gcash Receipt</button>";
-                                        }
+                                            // Check if gcash_receipts_id exists for the given order_id
+                                            $orderIdExistsInGcashReceipts = false; // Initialize the variable
+                                
+                                            $checkGcashReceiptsQuery = "SELECT o.id, g.id AS gcash_id, g.approved
+                                                                        FROM order_list o
+                                                                        LEFT JOIN gcash_receipts g ON o.gcash_receipts_id = g.id
+                                                                        WHERE o.id = $order_id";
+                                
+                                            $result = mysqli_query($conn, $checkGcashReceiptsQuery);
+                                
+                                            if ($result) {
+                                                $row = mysqli_fetch_assoc($result);
+                                
+                                                // Check if gcash_id is not null and approved is not equal to 1
+                                                if (!is_null($row['gcash_id']) && $row['approved'] != 1) {
+                                                    // There is a corresponding entry in gcash_receipts for the given order_id
+                                                    echo '<span style="color: orange; margin-left: 10px;">Pending</span>';
+                                                } elseif ($row['approved'] == 1) {
+                                                    // Gcash receipt is already approved
+                                                    echo '<span style="color: green; margin-left: 10px;">Approved</span>';
+                                                } else {
+                                                    // There is no corresponding entry in gcash_receipts for the given order_id
+                                                    echo "<button type=\"button\" onclick=\"uploadGcashReceipt($order_id)\" class=\"btn btn-success ml-4\">Pay Gcash</button>";
+                                                }
+                                            } else {
+                                                echo "Error querying the database: " . mysqli_error($conn);
+                                            }
+                                }
+
                                     } else {
                                         echo $formButton;
                                     }
