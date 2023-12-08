@@ -1,10 +1,7 @@
 <?php
 // Include your database connection here
 include ('./config/constants.php');
-if (!isset($_SESSION['userLoggedIn'])) {
-    header("Location: login.php");
-    exit();
-}
+
 
 if (isset($_POST['product_id']) && isset($_POST['color']) && isset($_POST['size'])) {
     $product_id = $_POST['product_id'];

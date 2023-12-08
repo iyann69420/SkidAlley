@@ -101,12 +101,9 @@
 }
 </style>
 <?php include('partials-front/menu.php'); ?>
-<br><br><br><br><br><br><br>
+<br><br><br>
 <?php
-if (isset($_SESSION['add'])) {
-    echo $_SESSION['add'];
-    unset($_SESSION['add']);
-}
+
 if(isset($row["id"])) {
     $id = $row["id"];
 }
@@ -134,117 +131,117 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
         if ($product_details) 
         {
             ?>
+            <div class="product-container">
              <div class="product-image-container" id="product-image-container">
                     <img
                         id="product-image"
                         src="<?php echo SITEURL; ?>images/bike/<?php echo $product_details['image_path']; ?>"
                         alt="<?php echo $product_details['name']; ?>"
-                        style="width: 300px">
+                        style="width: 500px">
                         
                         <div id="myresult" class="img-zoom-result"></div>
-
-                        
-                        
-                   
                 </div>
 
          
+            
+
+                <div class="product-details">
+                <h1><?php echo $product_details['name']; ?></h1>
 
 
-            <div class="product-details">
-            <h1><?php echo $product_details['name']; ?></h1>
+                    <div class="product-description">
+                        <p><?php echo $product_details['description']; ?></p>
+                    </div>
+                    <br><br>
 
-
-                <div class="product-description">
-                    <p><?php echo $product_details['description']; ?></p>
-                </div>
-
-                <div class="product-price">
+                    <div class="product-price">
                     <?php
                     $originalPrice = $product_details['price'];
                     $discountPercentage = $product_details['discount_percentage'];
 
                     if (!empty($discountPercentage) && $discountPercentage > 0) {
                         $discountedPrice = $originalPrice - ($originalPrice * $discountPercentage / 100);
-                        echo "<p>Original Price: ₱" . number_format($originalPrice) . "</p>";
-                        echo "<p>Discounted Price: ₱" . number_format($discountedPrice) . "</p>";
+                        echo "<p class='original-price'>Original Price: <span class='original-price-value'>₱" . number_format($originalPrice) . "</span></p>";
+                        echo "<p class='discount'>Discounted Price: ₱" . number_format($discountedPrice) . "</p>";
                     } else {
-                        echo "<p>Price: ₱" . number_format($originalPrice) . "</p>";
+                        echo "<p class='final'>Price: ₱" . number_format($originalPrice) . "</p>";
                     }
-                    ?>
+                    ?> 
                 </div>
 
 
-                <div class="product-sizes-colors">
 
-                
-                <h3>Colors:</h3>
-                    <ul>
-                    <?php
-                    // Fetch distinct colors for the specified product
-                    $colors_sql = "SELECT DISTINCT color FROM product_colors_sizes WHERE product_id = $product_id";
-                    $colors_result = mysqli_query($conn, $colors_sql);
+                    <div class="product-sizes-colors">
 
-                    if ($colors_result) {
-                        while ($color_row = mysqli_fetch_assoc($colors_result)) {
-                            $color = $color_row['color'];
+                    
+                    <h3>Colors:</h3>
+                        <ul>
+                        <?php
+                        // Fetch distinct colors for the specified product
+                        $colors_sql = "SELECT DISTINCT color FROM product_colors_sizes WHERE product_id = $product_id";
+                        $colors_result = mysqli_query($conn, $colors_sql);
 
-                            // Check if the color is not already in the uniqueColors array
-                            if (!in_array($color, $uniqueColors)) {
-                                $uniqueColors[] = $color;
-                                echo "<button class='color-button' data-color='$color'>$color</button>";
+                        if ($colors_result) {
+                            while ($color_row = mysqli_fetch_assoc($colors_result)) {
+                                $color = $color_row['color'];
+
+                                // Check if the color is not already in the uniqueColors array
+                                if (!in_array($color, $uniqueColors)) {
+                                    $uniqueColors[] = $color;
+                                    echo "<button class='color-button' data-color='$color'>$color</button>";
+                                }
                             }
+                        } else {
+                            echo "<p>No colors available.</p>";
                         }
-                    } else {
-                        echo "<p>No colors available.</p>";
-                    }
-                    ?>
-                    </ul>
+                        ?>
+                        </ul>
 
-                    <h3>Sizes:</h3>
-                    <ul>
-                    <?php
-                    // Fetch sizes for all colors but initially hide them
-                    $sizes_sql = "SELECT size, color FROM product_colors_sizes WHERE product_id = $product_id";
-                    $sizes_result = mysqli_query($conn, $sizes_sql);
-                    while ($size_row = mysqli_fetch_assoc($sizes_result)) {
-                        $size = $size_row['size'];
-                        $color = $size_row['color'];
-                        echo "<button class='size-button hidden' data-color='$color' data-size='$size'>$size</button>";
-                    }
-                    ?>
-                    </ul>
-                    </div>
+                        <h3>Sizes:</h3>
+                        <ul>
+                        <?php
+                        // Fetch sizes for all colors but initially hide them
+                        $sizes_sql = "SELECT size, color FROM product_colors_sizes WHERE product_id = $product_id";
+                        $sizes_result = mysqli_query($conn, $sizes_sql);
+                        while ($size_row = mysqli_fetch_assoc($sizes_result)) {
+                            $size = $size_row['size'];
+                            $color = $size_row['color'];
+                            echo "<button class='size-button hidden' data-color='$color' data-size='$size'>$size</button>";
+                        }
+                        ?>
+                        </ul>
+                        </div>
 
-                    <div class="stock-quantity">
-                        <p>Stock: <?php echo $product_details['stock_quantity']; ?> </p>
-                    </div>
+                        <div class="stock-quantity">
+                            <p>Stock: <?php echo $product_details['stock_quantity']; ?> </p>
+                        </div>
 
-                <div class="product-action">
-                <form action="process-cart.php" method="POST" class="product-form">
-                    
-                    <input type="hidden" name="product_id" value="<?php echo $product_details['id']; ?>">
-                    <input type="hidden" name="product_name" value="<?php echo $product_details['name']; ?>">
-                    <input type="hidden" name="product_price" value="<?php echo $product_details['price']; ?>">
-                    <input type="hidden" name="product_stock_quantity" value="<?php echo $product_details['stock_quantity']; ?>">
+                    <div class="product-action">
+                    <form action="process-cart.php" method="POST" class="product-form">
+                        
+                        <input type="hidden" name="product_id" value="<?php echo $product_details['id']; ?>">
+                        <input type="hidden" name="product_name" value="<?php echo $product_details['name']; ?>">
+                        <input type="hidden" name="product_price" value="<?php echo $product_details['price']; ?>">
+                        <input type="hidden" name="product_stock_quantity" value="<?php echo $product_details['stock_quantity']; ?>">
 
-                    <input type="hidden" id="selected_color" name="selected_color" value="">
-                     <input type="hidden" id="selected_size" name="selected_size" value="">
-                    
-                    
-                    <label for="quantity">Quantity:</label>
+                        <input type="hidden" id="selected_color" name="selected_color" value="">
+                        <input type="hidden" id="selected_size" name="selected_size" value="">
+                        
+                        
+                        <label for="quantity">Quantity:</label>
 
-                    <input type="number" id="quantity" name="quantity" value="1" min="1">
+                        <input type="number" id="quantity" name="quantity" value="1" min="1">
 
-                    <tr>
-                    <td colspan="2">
-                       
+                        <tr>
+                        <td colspan="2">
+                        
                         <input type="submit" name="add_to_cart" value="Add to Cart" class="btn-secondary">
-                    </td>
-                </tr>
+                        </td>
+                    </tr>
 
-                
-                </form>
+                    
+                    </form>
+                    </div>
                 </div>
             </div>
 
@@ -685,6 +682,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 <?php
 // Recommendation section
 ?>
+
 <div class="recommendation-section">
     <h2>Recommended Products</h2>
     <br><br>

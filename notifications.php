@@ -44,7 +44,8 @@ if (!isset($_SESSION['userLoggedIn'])) {
 
                 // Add a CSS class based on whether the notification has been read or not
                 $notificationClass = $isRead ? 'read' : 'unread';
-
+                
+                
                 ?>
                 <div class='notification <?php echo $notificationClass; ?>' onclick="showNotification('<?php echo $message ?>', '<?php echo $notificationType ?>', <?php echo $notificationId ?>)">
                     <p><?php echo $message ?></p>

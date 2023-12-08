@@ -64,7 +64,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
             exit();
     }
 
-   
+    if (!$exists) {
+        echo "Invalid product, brand, or category selected";
+        exit();
+    }
+
     // Insert data into the discounts table based on the selected option
     switch ($discount_for) {
         case 'product':
@@ -217,7 +221,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
 
 <script>
-    
       document.getElementById('discount_for').addEventListener('change', function () {
         var selectedOption = this.value;
         document.getElementById('selected_option').value = selectedOption;
@@ -237,8 +240,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
             alertify.error('Please fill in all required fields.');
         }
     });
-
-    
 </script>
 
 <?php include('partials/footer.php') ?>

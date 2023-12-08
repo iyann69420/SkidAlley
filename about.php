@@ -1,7 +1,7 @@
 <?php include('partials-front/menu.php'); ?>
 
 <html>
-<br><br><br><br><br><br><br><br>
+<br><br><br><br>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 <?php

@@ -104,6 +104,7 @@ include ('login-check.php');
                     <li><a href="services.php">Services</a></li>
                     <li><a href="messages.php">Message</a></li>
                     <li><a href="discounts.php">Discounts</a></li>
+                    <li><a href="vouchers.php">Vouchers</a></li>
                     <li><a href="clients.php">Client List</a></li>
                     <li><a href="supplier.php">Supplier</a></li>
                 </ul>

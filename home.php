@@ -35,13 +35,56 @@
 
     <div class="carousel-content">
         <h1>Welcome to Skid Alley Bike Shop</h1>
-        <p>Your one-stop shop for quality bikes and accessories.</p>
+        <br>
+        <p><strong>Your one-stop shop for quality bikes and accessories</strong></p>
+        <p><strong>The first and only FIXED GEAR BIKE SHOP in DASMARIÑAS</strong></p>
+
         <a href="index.php" class="shop-button">Shop Now</a>
     </div>
 </div>
 
     
     <script src="scripts/carousel.js"></script>
+
+    <div class="filter-price">
+        <h2>On a Tight Budget? Discover Your Perfect Choice Here</h2>
+        <form action="filter-price.php" method="GET">
+            <label for="category">Category:</label>
+            <select name="category_id" id="category_id">
+                                <?php
+                                $sql = "SELECT DISTINCT category_id FROM category_brands";
+                                $res = mysqli_query($conn, $sql);
+                                $count = mysqli_num_rows($res);
+
+                                if ($count > 0) {
+                                    while ($row = mysqli_fetch_assoc($res)) {
+                                        $category_id = $row['category_id'];
+                                        $category_sql = "SELECT * FROM categories WHERE id='$category_id' AND status='1'";
+                                        $category_res = mysqli_query($conn, $category_sql);
+                                        $category_row = mysqli_fetch_assoc($category_res);
+                                        if ($category_row) {
+                                            $title = $category_row['category'];
+                                            echo '<option value="' . $category_id . '">' . $title . '</option>';
+                                        }
+                                    }
+                                } else {
+                                    echo '<option value="0">No Category Found</option>';
+                                }
+                                ?>
+                            </select>
+
+            <label for="brand">Brand:</label>
+                <select name="brand" id="brand">
+                    <option value="">Select a category first</option>
+                </select>
+
+                <label for="min-price">Min Price:</label>
+                <input type="number" name="min-price" id="min-price" value="0">
+                <label for="max-price">Max Price:</label>
+                <input type="number" name="max-price" id="max-price">
+                <input type="submit" value="Filter">
+        </form>
+    </div>
 
     <div class="bikeset-section">
         <h2>Bike Set</h2>
@@ -137,45 +180,7 @@ $discountedProductsResult = mysqli_query($conn, $discountedProductsSql);
 </div>
 
 
-    <div class="filter-price">
-        <h2>Filter</h2>
-        <form action="filter-price.php" method="GET">
-            <label for="category">Category:</label>
-            <select name="category_id" id="category_id">
-                                <?php
-                                $sql = "SELECT DISTINCT category_id FROM category_brands";
-                                $res = mysqli_query($conn, $sql);
-                                $count = mysqli_num_rows($res);
-
-                                if ($count > 0) {
-                                    while ($row = mysqli_fetch_assoc($res)) {
-                                        $category_id = $row['category_id'];
-                                        $category_sql = "SELECT * FROM categories WHERE id='$category_id' AND status='1'";
-                                        $category_res = mysqli_query($conn, $category_sql);
-                                        $category_row = mysqli_fetch_assoc($category_res);
-                                        if ($category_row) {
-                                            $title = $category_row['category'];
-                                            echo '<option value="' . $category_id . '">' . $title . '</option>';
-                                        }
-                                    }
-                                } else {
-                                    echo '<option value="0">No Category Found</option>';
-                                }
-                                ?>
-                            </select>
-
-            <label for="brand">Brand:</label>
-                <select name="brand" id="brand">
-                    <option value="">Select a category first</option>
-                </select>
-
-                <label for="min-price">Min Price:</label>
-                <input type="number" name="min-price" id="min-price" value="0">
-                <label for="max-price">Max Price:</label>
-                <input type="number" name="max-price" id="max-price">
-                <input type="submit" value="Filter">
-        </form>
-    </div>
+    
 
 </body>
 </html>

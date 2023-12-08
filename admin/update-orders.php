@@ -69,22 +69,30 @@
         }
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            // Get the approval status and Gcash receipt id from the form
-            $approvalStatus = $_POST['approval_status'];
-            $gcashReceiptId = $_POST['gcash_receipt_id'];
-            
-            if ($paymentMethod === 'Gcash' && $approvalStatus == 1) {
+            // Check if the approval status and Gcash receipt id are set
+            if (isset($_POST['approval_status']) && isset($_POST['gcash_receipt_id'])) {
+                // Get the approval status and Gcash receipt id from the form
+                $approvalStatus = $_POST['approval_status'];
+                $gcashReceiptId = $_POST['gcash_receipt_id'];
+
+            if ($paymentMethod === 'Gcash' && $approvalStatus == 1 && !empty($gcashReceiptId)) {
                 // Update the approved field in the gcash_receipts table
                 $updateGcashReceiptSql = "UPDATE gcash_receipts SET approved = 1 WHERE id = $gcashReceiptId";
                 $updateGcashReceiptResult = mysqli_query($conn, $updateGcashReceiptSql);
-    
+
                 if ($updateGcashReceiptResult) {
-                    echo 'Gcash receipt approved successfully and status updated.';
+                    // Use Alertify for success message
+                    echo '<script>alertify.success("Gcash receipt approved successfully and status updated.");</script>';
                 } else {
-                    echo 'Error updating Gcash receipt status: ' . mysqli_error($conn);
+                    // Use Alertify for error message
+                    echo '<script>alertify.error("Error updating Gcash receipt status: ' . mysqli_error($conn) . '");</script>';
                 }
             }
-        
+            elseif ($approvalStatus == 0) {
+                // Disapproval logic here
+            } else {
+                // Handle other cases or provide appropriate feedback
+            }
             // Additional logic for disapproval
             if ($approvalStatus == 0) {
                 // Update the related foreign key in admin_notifications
@@ -148,7 +156,7 @@
                 
                 }
             
-            
+            }
     
         ?>
 
@@ -200,14 +208,16 @@
                     // Display the Gcash receipt image with an id
                     echo '<img id="gcashImage" src="' . $gcashReceiptPath . '" alt="Gcash Receipt" width="100px" onclick="openModal()">';
 
-                    // Add radio button for approval
-                    echo '<br>';
-                    echo 'Approved: ';
-                    echo '<input type="radio" name="approval_status" value="1" ' . ($approved == 1 ? 'checked' : '') . '> Yes ';
-                    echo '<input type="radio" name="approval_status" value="0" ' . ($approved == 0 ? 'checked' : '') . '> No ';
+                    if ($approved == 0) {
+                        // Add radio button for approval only if not already approved
+                        echo '<br>';
+                        echo 'Approved: ';
+                        echo '<input type="radio" name="approval_status" value="1"> Yes ';
+                        echo '<input type="radio" name="approval_status" value="0" checked> No ';
 
-                    // Add hidden input for Gcash receipt id
-                    echo '<input type="hidden" name="gcash_receipt_id" value="' . $gcashReceiptId . '">';
+                        // Add hidden input for Gcash receipt id
+                        echo '<input type="hidden" name="gcash_receipt_id" value="' . $gcashReceiptId . '">';
+                    }
                 } else {
                     echo 'No Gcash receipt found';
                 }
@@ -220,7 +230,7 @@
 <?php endif; ?>
 
 
-
+<form action="" method="POST" onsubmit="return validateStatusChange();">
 
 <div id="gcashModal" class="modal">
     <span class="close" onclick="closeModal()">&times;</span>
@@ -235,8 +245,9 @@
                 </tr>
 
                 <tr>
-                    <td>Status: </td>
-                    <td>
+                <td>Status: </td>
+                <td>
+                    <?php if ($paymentMethod !== 'Gcash' || ($paymentMethod === 'Gcash' && $approved == 1)): ?>
                         <select name="status" <?php echo ($order_receive == 1) ? 'disabled' : ''; ?>>
                             <option value="0" <?php if ($status == 0) echo 'selected'; ?>>Pending</option>
                             <option value="1" <?php if ($status == 1) echo 'selected'; ?>>Packed</option>
@@ -245,9 +256,13 @@
                             <option value="4" <?php if ($status == 4) echo 'selected'; ?>>Delivered</option>
                             <option value="5" <?php if ($status == 5) echo 'selected'; ?>>Cancelled</option>
                         </select>
-                    </td>
-                </tr>
-
+                    <?php else: ?>
+                        <select name="status" disabled>
+                            <option value="0" selected>Pending (Locked)</option>
+                        </select>
+                    <?php endif; ?>
+                </td>
+            </tr>
             </table>
 
             <table class="tbl-30">
@@ -380,6 +395,17 @@
 <?php include('partials/footer.php'); ?>
 
 <script>
+    function validateStatusChange() {
+    var approvalStatus = document.querySelector('input[name="approval_status"]:checked');
+    var gcashReceiptId = document.querySelector('input[name="gcash_receipt_id"]').value;
+
+    if (gcashReceiptId === "" && approvalStatus !== null && approvalStatus.value == 1) {
+        alertify.error("Please wait for the receipt to be uploaded before changing the status.");
+        return false; // Prevent form submission
+    }
+
+    return true; // Continue with form submission
+}
     function openModal() {
         var gcashImage = document.getElementById('gcashImage');
         var modal = document.getElementById('gcashModal');

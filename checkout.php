@@ -21,6 +21,57 @@ $deliveryOption = '';
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/themes/default.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
+<style>
+    .voucher-container {
+        margin-top: 20px;
+        padding: 15px; /* Adjust padding to control the inner spacing */
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        max-width: 500px; /* Set a maximum width for the container */
+        margin: 0 auto; /* Center the container horizontally */
+    }
+
+    .voucher-container h2 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
+        color: black;
+    }
+
+    .voucher-label {
+        display: flex;
+        align-items: center; /* Align items vertically in the flex container */
+        margin-bottom: 15px;
+        font-size: 1.4em;
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        background-color: #ecf0f1;
+        transition: background-color 0.3s ease;
+    }
+
+    .voucher-label:hover {
+        background-color: #d6eaf8;
+    }
+
+    .voucher-label input {
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+
+    .voucher-code {
+        font-weight: bold;
+        margin-right: auto;
+        margin-top: 13px ;
+    }
+
+    .voucher-amount {
+        color: #e74c3c;
+        margin-right: auto;
+        margin-top: 13px ;
+    }
+    
+    
+</style>
 
 <h1>Checkout</h1>
 <br>
@@ -75,7 +126,7 @@ $deliveryOption = '';
        INNER JOIN product_list p ON c.product_id = p.id
        LEFT JOIN discounts d ON c.product_id = d.product_id AND NOW() BETWEEN d.start_time AND d.end_time
        WHERE c.client_id = $userId";
-        $res = mysqli_query($conn, $sql);
+        $res = mysqli_query($conn, $sql);   
         $count = mysqli_num_rows($res);
         $sn = 1;
 
@@ -132,6 +183,30 @@ $deliveryOption = '';
     <textarea name="order_message" id="order_message" rows="4" cols="50"></textarea>
 </div>
 
+<div class="voucher-container">
+    <h2>Your Vouchers</h2>
+    <?php
+    // Fetch the user's vouchers
+    $voucherSql = "SELECT * FROM vouchers WHERE client_id = $userId AND is_redeemed = 0 AND expiration_date >= CURDATE()";
+    $voucherResult = mysqli_query($conn, $voucherSql);
+
+    if ($voucherResult && mysqli_num_rows($voucherResult) > 0) {
+        while ($voucher = mysqli_fetch_assoc($voucherResult)) {
+            ?>
+           <label class="voucher-label" onclick="toggleRadioButton(this)">
+                <input type="radio" name="selected_voucher" value="<?php echo $voucher['voucher_id']; ?>">
+                <span class="voucher-code"><?php echo $voucher['code']; ?></span>
+                <span class="voucher-amount">₱<?php echo number_format($voucher['amount'], 2); ?></span>
+            </label>    
+            <?php
+        }
+    } else {
+        echo "<p>No available vouchers.</p>";
+    }
+    ?>
+</div>
+
+
 <div class="payment-method">
     <h2>Payment Method</h2>
     <button class="select-payment-button" type="button" onclick="showPaymentButtons()">Select Payment Method</button>
@@ -151,6 +226,8 @@ $deliveryOption = '';
 <!-- Keep this hidden input field for payment_method -->
 <input type="hidden" name="payment_method" value="">
 
+
+
 <!-- Disable the submit button by default -->
 <input type="submit" name="checkout" value="Checkout" class="btn-secondary" disabled>
 <input type="hidden" name="delivery_address" id="delivery_address">
@@ -158,6 +235,10 @@ $deliveryOption = '';
 </body>
 
 <script>
+
+
+    
+    
     // Create a JavaScript object to store the delivery address
     var deliveryAddress = {
         fullname: "<?php echo $fullname; ?>",
@@ -182,6 +263,10 @@ $deliveryOption = '';
     const deliveryAddressInput = document.querySelector('input[name="delivery_address"]');
     const orderMessageTextarea = document.querySelector('textarea[name="order_message"]');
     const additionalFee = 300; // Additional fee for Cash on Delivery
+
+
+  
+
 
     if (paymentMethodInput) {
         let totalWithFee = <?php echo $totalPrice; ?>; // Initial total without fee
@@ -219,13 +304,14 @@ $deliveryOption = '';
         deliveryAddressInput.value = JSON.stringify(deliveryAddress.address);
 
         paymentDetails.innerHTML = `
-            Selected Payment Method: ${paymentMethod}<br>
-            Name: ${deliveryAddress.fullname}<br>
-            Contact Number: ${deliveryAddress.contact}<br>
-            Address: ${deliveryAddress.address}<br>
-            Additional Fee: ₱${additionalFee}<br>
-            Total Price: ${formattedTotalWithFee}
+            Selected Payment Method: <strong>${paymentMethod}</strong><br>
+            Name: <strong>${deliveryAddress.fullname}</strong><br>
+            Contact Number: <strong>${deliveryAddress.contact}</strong><br>
+            Address: <strong> ${deliveryAddress.address}</strong><br>
+            ${paymentMethod === 'Cash on Delivery' ? `Additional Fee: <strong>₱${additionalFee}</strong><br>` : ''}
+            Total Price: <strong>${formattedTotalWithFee}</strong>
         `;
+
 
         hidePaymentButtons();
 
@@ -241,6 +327,93 @@ $deliveryOption = '';
 </html>
 
 <?php
+function createVoucher($userId) {
+    global $conn;
+
+    // Check if the user has any unredeemed vouchers that have not expired
+    $existingVoucherSql = "SELECT * FROM vouchers WHERE client_id = ? AND is_redeemed = 0 AND expiration_date >= CURDATE()";
+    $existingVoucherStmt = mysqli_prepare($conn, $existingVoucherSql);
+    mysqli_stmt_bind_param($existingVoucherStmt, "i", $userId);
+    mysqli_stmt_execute($existingVoucherStmt);
+    $existingVoucherResult = mysqli_stmt_get_result($existingVoucherStmt);
+
+    if (!$existingVoucherResult || mysqli_num_rows($existingVoucherResult) == 0) {
+        // Generate a new voucher only if there are no unredeemed vouchers
+        // Check the user's purchase history
+        $purchaseHistorySql = "SELECT COUNT(*) as total_orders FROM order_list WHERE client_id = ?";
+        $purchaseHistoryStmt = mysqli_prepare($conn, $purchaseHistorySql);
+        mysqli_stmt_bind_param($purchaseHistoryStmt, "i", $userId);
+        mysqli_stmt_execute($purchaseHistoryStmt);
+        $purchaseHistoryResult = mysqli_stmt_get_result($purchaseHistoryStmt);
+
+        if ($purchaseHistoryResult) {
+            $totalOrders = mysqli_fetch_assoc($purchaseHistoryResult)['total_orders'];
+
+            // Check if the user has made 3 or more purchases
+            if ($totalOrders >= 2 && $totalOrders < 6) {
+                // Generate a voucher code (you may use any logic to create a unique code)
+                $voucherCode = generateVoucherCode();
+
+                // Set voucher amount to 200
+                $voucherAmount = 200;
+
+                // Set expiration date to 7 days from now
+                $expirationDate = date('Y-m-d', strtotime('+7 days'));
+
+                // Insert voucher into the vouchers table
+                $insertVoucherSql = "INSERT INTO vouchers (code, client_id, amount, expiration_date) 
+                                     VALUES (?, ?, ?, ?)";
+                $insertVoucherStmt = mysqli_prepare($conn, $insertVoucherSql);
+                mysqli_stmt_bind_param($insertVoucherStmt, "sids", $voucherCode, $userId, $voucherAmount, $expirationDate);
+                mysqli_stmt_execute($insertVoucherStmt);
+
+                // Return the voucher details (you may modify this based on your needs)
+                return [
+                    'code' => $voucherCode,
+                    'amount' => $voucherAmount,
+                    'expiration_date' => $expirationDate
+                ];
+            } elseif ($totalOrders >= 5) {
+                // Generate a voucher code (you may use any logic to create a unique code)
+                $voucherCode = generateVoucherCode();
+
+                // Set voucher amount to 400
+                $voucherAmount = 400;
+
+                // Set expiration date to 7 days from now
+                $expirationDate = date('Y-m-d', strtotime('+7 days'));
+
+                // Insert voucher into the vouchers table
+                $insertVoucherSql = "INSERT INTO vouchers (code, client_id, amount, expiration_date) 
+                                     VALUES (?, ?, ?, ?)";
+                $insertVoucherStmt = mysqli_prepare($conn, $insertVoucherSql);
+                mysqli_stmt_bind_param($insertVoucherStmt, "sids", $voucherCode, $userId, $voucherAmount, $expirationDate);
+                mysqli_stmt_execute($insertVoucherStmt);
+
+                // Return the voucher details (you may modify this based on your needs)
+                return [
+                    'code' => $voucherCode,
+                    'amount' => $voucherAmount,
+                    'expiration_date' => $expirationDate
+                ];
+            }
+        }
+    }
+
+    return null;
+}
+
+
+function generateVoucherCode($length = 8) {
+    $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $code = '';
+
+    for ($i = 0; $i < $length; $i++) {
+        $code .= $characters[rand(0, strlen($characters) - 1)];
+    }
+
+    return $code;
+}
 
 if (isset($_POST['checkout'])) {
   
@@ -257,11 +430,55 @@ if (isset($_POST['checkout'])) {
     }
 
     $totalPrice += $additionalFee;
+
+    if (isset($_POST['selected_voucher'])) {
+        $selectedVoucherId = mysqli_real_escape_string($conn, $_POST['selected_voucher']);
     
+        // Retrieve voucher details
+        $voucherDetailsSql = "SELECT * FROM vouchers WHERE voucher_id = $selectedVoucherId AND client_id = $userId AND is_redeemed = 0 AND expiration_date >= CURDATE()";
+        $voucherDetailsResult = mysqli_query($conn, $voucherDetailsSql);
+    
+        if ($voucherDetailsResult && mysqli_num_rows($voucherDetailsResult) > 0) {
+            $voucherDetails = mysqli_fetch_assoc($voucherDetailsResult);
+            $voucherAmount = $voucherDetails['amount'];
+    
+            // Deduct the voucher amount from the total price
+            $totalPrice -= $voucherAmount;
+    
+            // Update the voucher as redeemed
+            $redeemVoucherSql = "UPDATE vouchers SET is_redeemed = 1, redeemed_date = CURDATE() WHERE voucher_id = $selectedVoucherId";
+            mysqli_query($conn, $redeemVoucherSql);
+        }
+    }
+
+  
 
     $insertOrderSql = "INSERT INTO order_list (ref_code, client_id, total_amount, delivery_address, payment_method, message, status, order_receive)
     VALUES ('$refCode', $userId, $totalPrice, '$deliveryAddress', '$paymentMethod', '$orderMessage', 0, 0)";
 
+        $createdVoucher = createVoucher($userId);   
+        if ($createdVoucher) {
+            // Create a notification
+            $notificationvoucher = "Congratulations! You\'ve earned a voucher. Code: " . mysqli_real_escape_string($conn, $createdVoucher['code']);
+            $notificationType = "Voucher";
+            $timestamp = date('Y-m-d H:i:s');
+            $status = "new";
+            $isRead = 0;
+            $promoId = 0; // Replace this with the actual promo ID if applicable
+
+            $insertNotificationSql = "INSERT INTO notifications (user_id, message, notification_type, timestamp, status, is_read, promo_id) 
+                                    VALUES ($userId, '$notificationvoucher', '$notificationType', '$timestamp', '$status', $isRead, $promoId)";
+
+            if (mysqli_query($conn, $insertNotificationSql)) {
+                // Notification created successfully, you can handle additional logic if needed
+            } else {
+                // Handle the insert notification query error
+                echo "Error creating voucher notification: " . mysqli_error($conn);
+            }
+        }
+
+        
+    
 
 
     if (mysqli_query($conn, $insertOrderSql)) {
@@ -332,19 +549,19 @@ if (isset($_POST['checkout'])) {
                 mysqli_rollback($conn);
                 echo "Error updating stock records: " . mysqli_error($conn);
                 exit;
+                
             }
         }
 
-        // Step 5: Clear the user's cart
-        $clearCartSql = "DELETE FROM cart_list WHERE client_id = $userId";
-        mysqli_query($conn, $clearCartSql);
+    
 
-        // Step 6: Commit the changes
-        mysqli_commit($conn);
+
+      
 
         // Step 4: Commit the changes
         mysqli_commit($conn);
         $id = $orderId;
+
 
         $sql1 = "SELECT * FROM client_list WHERE id = $userId";
         $result = mysqli_query($conn, $sql1);
@@ -387,20 +604,18 @@ if (isset($_POST['checkout'])) {
             // Add the product details to the email content
             $mailContent .= '<div class="container">';
             $mailContent .= '<h3>Products Ordered:</h3>';
-
             // Retrieve the cart items with product details
             $cartItemsSql = "SELECT c.product_id, c.quantity, c.color, c.size, p.name, p.price, p.image_path 
-                            FROM cart_list c 
-                            INNER JOIN product_list p 
-                            ON c.product_id = p.id 
-                            WHERE c.client_id = $userId";
+            FROM cart_list c 
+            INNER JOIN product_list p 
+            ON c.product_id = p.id 
+            WHERE c.client_id = $userId";
             $cartItemsResult = mysqli_query($conn, $cartItemsSql);
+                
     
-            // Loop through each product to include its details
-            $cartItemsResult = mysqli_query($conn, $cartItemsSql);
             while ($cartItem = mysqli_fetch_assoc($cartItemsResult)) {
                 // Get the product details
-                $productName = $cartItem['name'];
+                  $productName = $cartItem['name'];
                 $productImage = SITEURL . 'images/bike/' . $cartItem['image_path'];
                 $productPrice = $cartItem['price'];
                 $productQuantity = $cartItem['quantity'];
@@ -453,6 +668,9 @@ if (isset($_POST['checkout'])) {
     
                 $mail->send();
                 echo 'Message has been sent';
+
+                $clearCartSql = "DELETE FROM cart_list WHERE client_id = $userId";
+                mysqli_query($conn, $clearCartSql);
             } 
 
             catch (Exception $e) 
@@ -473,14 +691,13 @@ if (isset($_POST['checkout'])) {
         mysqli_rollback($conn);
         echo "Error inserting order record: " . mysqli_error($conn);
     }
-
-    //Step 5: Clear the user's cart
-
-    $clearCartSql = "DELETE FROM cart_list WHERE client_id = $userId";
-    mysqli_query($conn, $clearCartSql);
+      
+     
+ 
 }
 
 ?>
+
 
 <br><br><br>
 <?php include('partials-front/footer.php'); ?>

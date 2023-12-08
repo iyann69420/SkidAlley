@@ -148,14 +148,16 @@
                 }
             } else {
                 echo '<h1> You Searched: "' . $search . '"</h1>';
-                echo '<br><br>';
-                echo 'No products found.';
+                echo '<br><br><br><br>';
+                echo '<div style="margin-left: 30px;"><span style="font-size: 24px;">No products found</span></div>';
+
             }
         } else {
             echo 'Error in executing the query.';
         }
     }
     ?>
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
 </div>
 
 <?php include('partials-front/footer.php'); ?>

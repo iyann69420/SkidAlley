@@ -1,69 +1,28 @@
 <?php
-date_default_timezone_set('Asia/Manila');
-// Include database connection and constants
+
 include ('../config/constants.php');
 
-// Check database connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$id = $_GET['id'];
 
-// Get current timestamp
-$currentTimestamp = date("Y-m-d H:i:s");
+ //create sql query to delete admin 
+ $sql = "DELETE FROM product_list WHERE id=$id";
+ $res = mysqli_query($conn, $sql); 
 
-// Construct the SQL query to select rows where end_time has passed
-$selectSql = "SELECT * FROM discounts WHERE end_time < '$currentTimestamp'";
+ //check whether the query is executed sucessfully or not
+ if($res==true)
+ {
+   //echo "Admin Deleted";
+   $_SESSION['delete'] = "<div class = 'success'>Service Deleted Sucessfully </div>";
+   
+   header('location:'.SITEURL.'admin/product-list.php');
+ }
+ else
+ {
+   //echo "Failed to Delete ";
 
+   $_SESSION['delete'] = "<div class = 'error'>Failed to Delete Service </div> ";
+   
+   header('location:'.SITEURL.'admin/product-list.php');
+ }
 
-// Output the SQL query for debugging
-echo "Debugging: $selectSql<br>";
-
-// Execute the select query
-$selectResult = $conn->query($selectSql);
-
-// Check for errors and affected rows
-if ($selectResult !== FALSE) {
-    $affectedRows = $selectResult->num_rows;
-
-    // Output the number of affected rows for debugging
-    echo "Debugging: Affected rows: $affectedRows<br>";
-
-    if ($affectedRows > 0) {
-        // Construct the SQL query to delete rows where end_time has passed
-        $deleteSql = "DELETE FROM discounts WHERE end_time < '$currentTimestamp'";
-
-        // Output the SQL query for debugging
-        echo "Debugging: $deleteSql<br>";
-
-        // Execute the delete query
-        $deleteResult = $conn->query($deleteSql);
-
-        // Check for errors and affected rows
-        if ($deleteResult !== FALSE) {
-            $affectedRows = $conn->affected_rows;
-
-            // Output the number of affected rows for debugging
-            echo "Debugging: Affected rows: $affectedRows<br>";
-
-            if ($affectedRows > 0) {
-                echo "Rows deleted successfully. Affected rows: $affectedRows.<br>";
-            } else {
-                echo "No rows deleted. No rows matched the condition.<br>";
-            }
-        } else {
-            // Output any error message for debugging
-            echo "Debugging: MySQL error message: " . $conn->error . "<br>";
-            echo "Error executing delete query: " . $conn->error;
-        }
-    } else {
-        echo "No rows to delete. No rows matched the condition.<br>";
-    }
-} else {
-    // Output any error message for debugging
-    echo "Debugging: MySQL error message: " . $conn->error . "<br>";
-    echo "Error executing select query: " . $conn->error;
-}
-
-// Close database connection
-$conn->close();
 ?>
