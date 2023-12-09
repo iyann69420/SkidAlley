@@ -39,6 +39,12 @@
     transform: translateY(-4px);
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+.suggested-heading {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 28px;
+    }
 </style>
 
 
@@ -48,10 +54,7 @@ include('partials-front/menu.php');
 ?>
 <br><br><br><br>
 <?php
-if (!isset($_SESSION['userLoggedIn'])) {
-    header("Location: login.php");
-    exit();
-}
+
 
 // Function to get discount percentage for a product
 function getDiscountPercentage($conn, $productId) {
@@ -103,6 +106,10 @@ if (isset($_GET['min-price']) && isset($_GET['max-price'])) {
 
     if ($res && mysqli_num_rows($res) > 0) {
         ?>
+        <div class="suggested-heading">
+        <h2>Suggested</h2>
+        </div>
+        <br>
         <div class="filtered-product-container">
             <?php
             while ($product = mysqli_fetch_assoc($res)) {
@@ -110,7 +117,9 @@ if (isset($_GET['min-price']) && isset($_GET['max-price'])) {
                 $price = $product['price'];
                 $discountedPrice = calculateDiscountedPrice($price, $discountPercentage);
                 ?>
+                
                 <div class="filtered-product">
+                    
                     <a href="product-details.php?id=<?= $product['id'] ?>">
                         <img src="<?= SITEURL ?>images/bike/<?= $product['image_path'] ?>" alt="<?= $product['name'] ?>" style="width: 250px;">
                         <h3><?= $product['name'] ?></h3>

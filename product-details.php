@@ -20,6 +20,10 @@
     flex-direction: row; /* Change this back to 'row' */
     align-items: flex-start; /* Align items to the top */
     justify-content: space-between; /* Add this line to align client and stars */
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   }
 
   .content {
@@ -79,17 +83,31 @@
     overflow: auto;
     background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.9);
-}
+    }
 
-/* Style for the modal content */
-.modal-content {
-    margin: auto;
-    display: block;
-    width: 80%;
-    max-width: 700px;
-}
+    
+    .modal-content {
+        margin: auto;
+        display: block;
+        width: 80%;
+        max-width: 700px;
+    }
+    .hidden-review {
+        display: none;
+    }
 
-/* Style for the close button */
+    #toggle-reviews-btn {
+        background-color: #000;
+        color: #fff;
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    #toggle-reviews-btn:hover {
+        background-color: #ffA500; /* Orange color on hover */
+    }
 .close {
     position: absolute;
     top: 15px;
@@ -117,13 +135,13 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
     $order_id = isset($_GET['order_id']) ? $_GET['order_id'] : null;
 
 
-    // Fetch product details from the database
+    $currentTime = date('Y-m-d H:i:s');
     $sql = "SELECT pl.*, sl.quantity AS stock_quantity, d.discount_percentage
-        FROM product_list pl 
-        LEFT JOIN stock_list sl ON pl.id = sl.product_id 
-        LEFT JOIN discounts d ON pl.id = d.product_id AND NOW() BETWEEN d.start_time AND d.end_time
-        WHERE pl.id = $product_id";
-    $res = mysqli_query($conn, $sql);
+            FROM product_list pl 
+            LEFT JOIN stock_list sl ON pl.id = sl.product_id 
+            LEFT JOIN discounts d ON pl.id = d.product_id AND (d.end_time IS NULL OR d.end_time >= '$currentTime')
+            WHERE pl.id = $product_id";
+        $res = mysqli_query($conn, $sql);
         
     if ($res) 
     {
@@ -267,6 +285,8 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+
+
 
     
     // Ensure that the imageZoom function is defined
@@ -451,6 +471,7 @@ function addToCart(inputQuantity) {
 
 
 <div class="reviews-section">
+<div class="review-box">
     <h2>Reviews</h2>
     <br><br>
 
@@ -482,7 +503,7 @@ function addToCart(inputQuantity) {
         </select>
     </form>
 
-    <div class="review-box">
+   
     <?php
 // Define default values for filters
 $starFilter = isset($_GET['star-filter']) ? intval($_GET['star-filter']) : 0;
@@ -537,6 +558,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
     if ($reviews_res) {
         if (mysqli_num_rows($reviews_res) > 0) {
+            $reviewCount = 0;
             while ($review = mysqli_fetch_assoc($reviews_res)) {
                 // Use the correct variable names
                 $review_id = $review["review_id"];
@@ -560,12 +582,14 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                 $color = $review['color'];
                 $size = $review['size'];
 
+                $reviewClass = $reviewCount >= 2 ? 'hidden-review' : '';
+
                 ?>
-                <div class="review">
+                <div class="review <?php echo $reviewClass; ?>">
                     <div class="content">
                         <!-- Client and Stars Section -->
                         <div class="client-stars">
-                            <p class="client">Client: <?php echo $client_username; ?></p>
+                            <p class="client">Name: <?php echo $client_username; ?></p>
                             <p class="stars">Stars:
                                 <?php
                                 // Display stars based on the number of stars in the review
@@ -607,6 +631,15 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                     </div>
                 </div>
                 <?php
+
+                $reviewCount++;
+                }
+                if ($reviewCount > 2) {
+                    ?>
+                    <button id="toggle-reviews-btn" onclick="toggleReviews()">View All Reviews</button>
+                    <?php
+
+              
                 }
             } else {
                 echo "<p>No reviews available for this product.</p>";
@@ -623,6 +656,27 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     </div>
 
     <script>
+        var reviewsHidden = true;
+
+        function toggleReviews() {
+            var reviews = document.querySelectorAll('.review');
+
+            reviews.forEach(function (review, index) {
+                if (reviewsHidden) {
+                    // Show all reviews
+                    review.classList.remove('hidden-review');
+                } else if (index >= 2) {
+                    // Hide additional reviews
+                    review.classList.add('hidden-review');
+                }
+            });
+
+            // Toggle button text
+            var toggleButton = document.getElementById('toggle-reviews-btn');
+            toggleButton.innerHTML = reviewsHidden ? 'Hide Reviews' : 'View All Reviews';
+
+            reviewsHidden = !reviewsHidden;
+        }
 
         function openModal() {
             var reviewImage = document.getElementById('reviewimage');
@@ -700,7 +754,7 @@ if ($client_id > 0) {
                             JOIN product_list ON order_products.product_id = product_list.id
                             WHERE order_list.client_id = $client_id
                             ORDER BY order_list.date_created DESC
-                            LIMIT 6";
+                            LIMIT 10";
 
     $recentlyPurchasedRes = mysqli_query($conn, $recentlyPurchasedSql);
 
@@ -720,7 +774,7 @@ if ($client_id > 0) {
         }
 
         // Fill remaining slots with general recommendations
-        $remainingSlots = 6 - mysqli_num_rows($recentlyPurchasedRes);
+        $remainingSlots = 30 - mysqli_num_rows($recentlyPurchasedRes);
         if ($remainingSlots > 0) {
             // Fetch general recommended products from the database
             $generalRecommendedSql = "SELECT * FROM product_list WHERE status = 1 AND id != $product_id LIMIT $remainingSlots";
