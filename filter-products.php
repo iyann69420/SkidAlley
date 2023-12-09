@@ -47,51 +47,46 @@ $sql .= " GROUP BY pl.id";
 
 $res = mysqli_query($conn, $sql);
 
-?>
-<br><br><br><br><br><br><br><br>
-<div class="bikelist-container-filter" id="product-list">
-    <?php
-    // Build and return the filtered product list
-    if (mysqli_num_rows($res) > 0) {
-        while ($row = mysqli_fetch_assoc($res)) {
-            $id = $row['id'];
-            $title = $row['name'];
-            $description = $row['description'];
-            $image_name = $row['image_path'];
-            $price = $row['price'];
-            $stock = $row['stock_quantity'];
-            ?>
+// Build and return the filtered product list
+if (mysqli_num_rows($res) > 0) {
+    while ($row = mysqli_fetch_assoc($res)) {
+        $id = $row['id'];
+        $title = $row['name'];
+        $description = $row['description'];
+        $image_name = $row['image_path'];
+        $price = $row['price'];
+        $stock = $row['stock_quantity'];
 
-            <div class="bikelist-filter">
-                <div class="bikes-filter">
-                    <?php
-                    // Check if the image is available
-                    if ($image_name == "") {
-                        echo "<div class ='error'>Image not Available</div>";
-                    } else {
-                        // Image available
-                        ?>
-                        <a href="product-details.php?id=<?php echo $id; ?>">
-                            <img src="<?php echo SITEURL; ?>images/bike/<?php echo $image_name ?>" style="width: 300px">
-                        </a>
-                    <?php
-                    }
-                    ?>
-                    <h2>Product Name: <?php echo $title; ?> </h2>
-                    <p>Price: <?php echo $price; ?> </p>
-                </div>
+        ?>
+
+        <div class="bikelist">
+            <div class="bikes">
+                <?php
+                //check image if available
+                if ($image_name == "") {
+                    echo "<div class ='error'>Image not Available</div>";
+                } else {
+                    //image available
+                ?>
+                    <a href="product-details.php?id=<?php echo $id; ?>">
+                        <img src="<?php echo SITEURL; ?>images/bike/<?php echo $image_name ?>" style="width: 300px">
+                    </a>
+                <?php
+                }
+
+                ?>
+                <h2><?php echo $title; ?> </h2>
+                <p> Price: <?php echo $price; ?> </p>
+                
             </div>
-            <?php
-        }
-    } else {
-        echo '<div style="margin-left: 50px;"><span style="font-size: 24px;">No products found</span></div>';
-    }
-    ?>
 
-   
-</div>
-
+        </div>
+      
     <?php
+    }
+} else {
+    echo '<div class="error">No products found.</div>';
+}
 
 // Close database connection
 mysqli_close($conn);

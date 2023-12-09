@@ -15,223 +15,200 @@ $totalPrice = 0;
 $deliveryOption = '';
 
 ?>
-<br><br><br><br><br><br><br><br>
-<body style="text-align: center"; >
+<style>
+    #orderSummary div {
+    margin-bottom: 10px;
+}
+</style>
+
+<br><br>
+<body  >
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/alertify.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/themes/default.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
 <style>
-    .voucher-container {
-        margin-top: 20px;
-        padding: 15px; /* Adjust padding to control the inner spacing */
-        border: 1px solid #ccc;
-        background-color: #f9f9f9;
-        max-width: 500px; /* Set a maximum width for the container */
-        margin: 0 auto; /* Center the container horizontally */
-    }
-
-    .voucher-container h2 {
-        font-size: 1.8em;
-        margin-bottom: 15px;
-        color: black;
-    }
-
-    .voucher-label {
-        display: flex;
-        align-items: center; /* Align items vertically in the flex container */
-        margin-bottom: 15px;
-        font-size: 1.4em;
-        padding: 10px;
-        border: 1px solid #bdc3c7;
-        border-radius: 5px;
-        background-color: #ecf0f1;
-        transition: background-color 0.3s ease;
-    }
-
-    .voucher-label:hover {
-        background-color: #d6eaf8;
-    }
-
-    .voucher-label input {
-        vertical-align: middle;
-        margin-right: 10px;
-    }
-
-    .voucher-code {
-        font-weight: bold;
-        margin-right: auto;
-        margin-top: 13px ;
-    }
-
-    .voucher-amount {
-        color: #e74c3c;
-        margin-right: auto;
-        margin-top: 13px ;
-    }
-    
-    
+   
 </style>
 
-<h1>Checkout</h1>
+
 <br>
 <form method="post">
-<div class="delivery-address">
-    <h2>Delivery Address</h2>
-    <?php
-    // Fetch the delivery address for the logged-in user
-    $sql = "SELECT * FROM client_list WHERE id = $userId";
-    $res = mysqli_query($conn, $sql);
+<div class="container-wrapper">
+    <div class="checkout-container">
+                <br><br>
+            <h1>Checkout</h1>
 
-    if ($res == TRUE) {
-        $count = mysqli_num_rows($res);
+            <div class="delivery-address">
+                <h2>Delivery Address</h2>
+                <br>
+                <?php
+                // Fetch the delivery address for the logged-in user
+                $sql = "SELECT * FROM client_list WHERE id = $userId";
+                $res = mysqli_query($conn, $sql);
 
-        if ($count > 0) {
-            $row = mysqli_fetch_assoc($res);
-            $fullname = $row['fullname'];
-            $contact = $row['contact'];
-            $address = $row['address'];
+                if ($res == TRUE) {
+                    $count = mysqli_num_rows($res);
 
-            // Pass the user's delivery address to JavaScript
-            echo "<script>";
-            echo "var deliveryAddress = {";
-            echo "    fullname: '" . $fullname . "',";
-            echo "    contact: '" . $contact . "',";
-            echo "    address: '" . $address . "'";
-            echo "};";
-            echo "</script>";
-        }
-    }
-    ?>
-    <p>Name: <?php echo $fullname; ?></p>
-    <p>Contact Number: <?php echo $contact; ?></p>
-    <p>Address: <?php echo $address; ?></p>
-</div>
+                    if ($count > 0) {
+                        $row = mysqli_fetch_assoc($res);
+                        $fullname = $row['fullname'];
+                        $contact = $row['contact'];
+                        $address = $row['address'];
 
-<table class="purchase-order">
-
-    <tr>
-        <th>Product Order</th>
-        <th>Image</th>
-        <th>Color and Size</th>
-        <th>Unit Price</th>
-        <th>Quantity</th>
-        <th>Price</th>
-    </tr>
-
-    <tr>
-        <?php
-       $sql = "SELECT c.id, c.product_id, c.quantity, c.color, c.size, p.name, p.price, p.image_path, d.discount_percentage
-       FROM cart_list c
-       INNER JOIN product_list p ON c.product_id = p.id
-       LEFT JOIN discounts d ON c.product_id = d.product_id AND NOW() BETWEEN d.start_time AND d.end_time
-       WHERE c.client_id = $userId";
-        $res = mysqli_query($conn, $sql);   
-        $count = mysqli_num_rows($res);
-        $sn = 1;
-
-        if ($count > 0) {
-            while ($row = mysqli_fetch_assoc($res)) {
-                $cart_id = $row['id'];
-                $product_id = $row['product_id'];
-                $product_name = $row['name'];
-                $product_price = $row['price'];
-                $product_quantity = $row['quantity'];
-                $product_total = $product_price * $product_quantity;
-                $product_image = $row['image_path'];
-                $product_color = $row['color'];
-                $product_size = $row['size'];
-
-
-                $discount_percentage = $row['discount_percentage'];
-
-                $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
-                $product_total = $discounted_price * $product_quantity; // Updated calculation with discount
-                $product_price_display = $discounted_price;
-
+                        // Pass the user's delivery address to JavaScript
+                        echo "<script>";
+                        echo "var deliveryAddress = {";
+                        echo "    fullname: '" . $fullname . "',";
+                        echo "    contact: '" . $contact . "',";
+                        echo "    address: '" . $address . "'";
+                        echo "};";
+                        echo "</script>";
+                    }
+                }
                 ?>
-                 <tr>
-                    <td><?php echo $product_name; ?></td>
-                    <td><?php
-                        if ($product_image == "") {
-                            echo "<div class='error'>Image not Added.</div>";
-                        } else {
-                            ?>
-                            <img src="<?php echo SITEURL; ?>images/bike/<?php echo $product_image; ?>"
-                                width="50px">
-                            <?php
-                        }
-                        ?></td>
-                    <td><?php echo "Color: " . $product_color . "<br>Size: " . $product_size; ?></td>
-                    <td>₱<?php echo number_format($product_price_display); ?></td>
-                    <td><?php echo $product_quantity; ?></td>
-                    <td>₱<?php echo number_format($product_total); ?></td>
+                <p><strong>Name:</strong> <?php echo $fullname; ?></p>
+                <p><strong>Contact Number:</strong> <?php echo $contact; ?></p>
+                <p><strong>Address:</strong> <?php echo $address; ?></p>
+            </div>
+
+            <table class="purchase-order">
+
+                <tr>
+                    <th>Product Order</th>
+                    <th>Image</th>
+                    <th>Color and Size</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
                 </tr>
 
+                <tr>
+                    <?php
+                $currentTime = date('Y-m-d H:i:s');
+                $sql = "SELECT c.id, c.product_id, c.quantity, c.color, c.size, p.name, p.price, p.image_path, d.discount_percentage
+               FROM cart_list c
+               INNER JOIN product_list p ON c.product_id = p.id
+               LEFT JOIN discounts d ON c.product_id = d.product_id AND (d.end_time IS NULL OR d.end_time >= '$currentTime')
+               WHERE c.client_id = $userId";
+                    $res = mysqli_query($conn, $sql);   
+                    $count = mysqli_num_rows($res);
+                    $sn = 1;
+
+                    if ($count > 0) {
+                        while ($row = mysqli_fetch_assoc($res)) {
+                            $cart_id = $row['id'];
+                            $product_id = $row['product_id'];
+                            $product_name = $row['name'];
+                            $product_price = $row['price'];
+                            $product_quantity = $row['quantity'];
+                            $product_total = $product_price * $product_quantity;
+                            $product_image = $row['image_path'];
+                            $product_color = $row['color'];
+                            $product_size = $row['size'];
+
+
+                            $discount_percentage = $row['discount_percentage'];
+
+                            $discounted_price = $product_price - ($product_price * ($discount_percentage / 100));
+                            $product_total = $discounted_price * $product_quantity; // Updated calculation with discount
+                            $product_price_display = $discounted_price;
+
+                            ?>
+                            <tr>
+                                <td><?php echo $product_name; ?></td>
+                                <td><?php
+                                    if ($product_image == "") {
+                                        echo "<div class='error'>Image not Added.</div>";
+                                    } else {
+                                        ?>
+                                        <img src="<?php echo SITEURL; ?>images/bike/<?php echo $product_image; ?>"
+                                            width="50px">
+                                        <?php
+                                    }
+                                    ?></td>
+                                <td><?php echo "Color: " . $product_color . "<br>Size: " . $product_size; ?></td>
+                                <td>₱<?php echo number_format($product_price_display); ?></td>
+                                <td><?php echo $product_quantity; ?></td>
+                                <td>₱<?php echo number_format($product_total); ?></td>
+                            </tr>
+
+                            <?php
+                            $totalPrice += $product_total;
+                        }
+                    }
+
+                    ?>
+                </tr>
+            </table>
+
+
+            <div class="order-message">
+                <label for="order_message">Message:</label>
+                <textarea name="order_message" id="order_message" rows="4" cols="50"></textarea>
+            </div>
+            <br>
+
+            <div class="voucher-container">
+                <h2>Your Vouchers</h2>
                 <?php
-                $totalPrice += $product_total;
-            }
-        }
+                // Fetch the user's vouchers
+                $voucherSql = "SELECT * FROM vouchers WHERE client_id = $userId AND is_redeemed = 0 AND expiration_date >= CURDATE()";
+                $voucherResult = mysqli_query($conn, $voucherSql);
 
-        ?>
-    </tr>
-</table>
-
-
-<div class="order-message">
-    <label for="order_message">Message:</label>
-    <textarea name="order_message" id="order_message" rows="4" cols="50"></textarea>
-</div>
-
-<div class="voucher-container">
-    <h2>Your Vouchers</h2>
-    <?php
-    // Fetch the user's vouchers
-    $voucherSql = "SELECT * FROM vouchers WHERE client_id = $userId AND is_redeemed = 0 AND expiration_date >= CURDATE()";
-    $voucherResult = mysqli_query($conn, $voucherSql);
-
-    if ($voucherResult && mysqli_num_rows($voucherResult) > 0) {
-        while ($voucher = mysqli_fetch_assoc($voucherResult)) {
-            ?>
-           <label class="voucher-label" onclick="toggleRadioButton(this)">
-                <input type="radio" name="selected_voucher" value="<?php echo $voucher['voucher_id']; ?>">
-                <span class="voucher-code"><?php echo $voucher['code']; ?></span>
-                <span class="voucher-amount">₱<?php echo number_format($voucher['amount'], 2); ?></span>
-            </label>    
-            <?php
-        }
-    } else {
-        echo "<p>No available vouchers.</p>";
-    }
-    ?>
-</div>
+                if ($voucherResult && mysqli_num_rows($voucherResult) > 0) {
+                    while ($voucher = mysqli_fetch_assoc($voucherResult)) {
+                        ?>
+                    <label class="voucher-label" onclick="toggleRadioButton(this)">
+                            <input type="radio" name="selected_voucher" value="<?php echo $voucher['voucher_id']; ?>">
+                            <span class="voucher-code"><?php echo $voucher['code']; ?></span>
+                            <span class="voucher-amount">₱<?php echo number_format($voucher['amount'], 2); ?></span>
+                        </label>    
+                        <?php
+                    }
+                } else {
+                    echo "<p>No available vouchers.</p>";
+                }
+                ?>
+            </div>
 
 
-<div class="payment-method">
-    <h2>Payment Method</h2>
-    <button class="select-payment-button" type="button" onclick="showPaymentButtons()">Select Payment Method</button>
-    <div class="payment-buttons">
-        <button class="payment-button" type="button" onclick="showPaymentDetails('Pickup')">Pick Up</button>
-        <button class="payment-button" type="button" onclick="showPaymentDetails('Cash on Delivery')">Cash on Delivery</button>
-        <button class="payment-button" type="button" onclick="showPaymentDetails('Gcash')">Gcash</button>
+            <div class="payment-method">
+                <h2>Payment Method</h2>
+                <button class="select-payment-button" type="button" onclick="showPaymentButtons()">Select Payment Method</button>
+                <div class="payment-buttons">
+                    <button class="payment-button" type="button" onclick="showPaymentDetails('Pickup')">Pick Up</button>
+                    <button class="payment-button" type="button" onclick="showPaymentDetails('Cash on Delivery')">Cash on Delivery</button>
+                    <button class="payment-button" type="button" onclick="showPaymentDetails('Gcash')">Gcash</button>
+            </div>
+        
+        </div>
+
+   
+
+    
+     </div>  
+        <!-- Keep this hidden input field for payment_method -->
+        <input type="hidden" name="payment_method" value="">
+        <br>
+            <div class="summary-container">
+                <h3>Summary</h3>
+                        <div class="payment-details">
+                        
+                            <div id="orderSummary">
+                                <!-- Content will be dynamically updated here -->
+                            </div>
+
+                                <!-- Remove the duplicate input element -->
+                    
+                            </div>
+                            <!-- Disable the submit button by default -->
+                <input type="submit" name="checkout" value="Checkout" class="checkout-btn" disabled>
+                <input type="hidden" name="delivery_address" id="delivery_address">
+            </div>
     </div>
-    <div class="payment-details">
-        <!-- Remove the duplicate input element -->
-    </div>
-</div>
-
-
-
-
-<!-- Keep this hidden input field for payment_method -->
-<input type="hidden" name="payment_method" value="">
-
-
-
-<!-- Disable the submit button by default -->
-<input type="submit" name="checkout" value="Checkout" class="btn-secondary" disabled>
-<input type="hidden" name="delivery_address" id="delivery_address">
-</form>
+        <!-- Disable the submit button by default -->
+        
 </body>
 
 <script>
@@ -303,14 +280,16 @@ $deliveryOption = '';
         // Set the delivery_address input value
         deliveryAddressInput.value = JSON.stringify(deliveryAddress.address);
 
-        paymentDetails.innerHTML = `
-            Selected Payment Method: <strong>${paymentMethod}</strong><br>
-            Name: <strong>${deliveryAddress.fullname}</strong><br>
-            Contact Number: <strong>${deliveryAddress.contact}</strong><br>
-            Address: <strong> ${deliveryAddress.address}</strong><br>
-            ${paymentMethod === 'Cash on Delivery' ? `Additional Fee: <strong>₱${additionalFee}</strong><br>` : ''}
-            Total Price: <strong>${formattedTotalWithFee}</strong>
+        const orderSummary = document.getElementById('orderSummary');
+        orderSummary.innerHTML = `
+            <div><strong>Selected Payment Method:</strong> ${paymentMethod}</div>
+            <div><strong>Name:</strong> ${deliveryAddress.fullname}</div>
+            <div><strong>Contact Number:</strong> ${deliveryAddress.contact}</div>
+            <div><strong>Address:</strong> ${deliveryAddress.address}</div>
+            ${paymentMethod === 'Cash on Delivery' ? `<div><strong>Additional Fee (Shipping):</strong> ₱${additionalFee}</div>` : ''}
+            <div><strong>Total Price:</strong> ${formattedTotalWithFee}</div>
         `;
+
 
 
         hidePaymentButtons();

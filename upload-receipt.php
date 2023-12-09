@@ -1,3 +1,8 @@
+<style>
+
+
+</style>
+
 <?php
 include ('./config/constants.php');
 
@@ -234,6 +239,8 @@ if (isset($_GET['order_id'])) {
         echo "Error fetching order details: " . mysqli_error($conn);
     }
 } else {
-    echo "Order ID not provided";
+    echo "<p style='color: red; font-size: 32px; font-weight: bold; text-align: center; margin-top: 300px;'>Order ID not provided</p>";
+
+
 }
 ?>

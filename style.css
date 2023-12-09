@@ -194,20 +194,21 @@ a:hover {
 }
 
 .bikelist {
-    display: inline-block; /* Remove grid-related properties */
-    width: 100%; /* Take up full width of the grid column */
-    box-sizing: border-box; /* Include padding in width calculation */
+    display: inline-block;
+    width: 100%;
+    box-sizing: border-box;
     padding: 10px;
-    height: 100%;
+    /* Remove height: 100%; */
 }
 
-.bikes  {
+.bikes {
     text-align: center;
-    height: 100%;
+    /* Remove height: 100%; */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    position: relative; /* Add relative positioning for absolute positioning of discount label */
+    position: relative;
+   
 }
 
 .bikes .discount-label {
@@ -243,24 +244,34 @@ a:hover {
 
 
 
-
 .bikelist-container-filter {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: 10px;
 }
 
 .bikelist-filter {
+    display: inline-block;
+    width: 100%;
     box-sizing: border-box;
     padding: 10px;
-    border: 1px solid #ddd;
-    overflow: hidden;
+    height: 100%;
 }
 
 .bikelist-filter img {
     max-width: 100%;
-    height: auto;
+    height: 100%; /* Adjust this value as needed */
     object-fit: cover;
+}
+
+.bikes-filter .discount-label {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #e74c3c; /* Red background color */
+    color: #fff; /* White text color */
+    padding: 5px;
+    border-radius: 5px;
 }
 
 .bikelist-filter h2 {
@@ -278,7 +289,6 @@ a:hover {
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-
 /* FOOTER */
 
 
@@ -289,7 +299,7 @@ a:hover {
     padding: 10px;
     width: 100%;
     position: relative;
-    margin-top: auto;
+    margin-top: 400px;
 }
 
 .sticky-footer {
@@ -1151,16 +1161,88 @@ cursor: pointer;
 
 /*checkout page */
 
+.container-wrapper {
+    display: flex;
+   
+}
+
+.checkout-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 45%; /* Adjust the container width as needed */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    margin: 20px;
+    padding: 20px;
+    text-align: center;
+}
+
+.summary-container {
+    width: 50%; /* Adjust the container width as needed */
+    height: 400px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    margin: 20px;
+    padding: 20px;
+    text-align: center;
+    
+    
+}
+
+.summary-container h3 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    color: black;
+    text-align: center;
+}
+.checkout-btn{
+    
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 8px 80px;
+    cursor: pointer;
+    border-radius: 40px;
+    height: 50px;
+    font-size: 24px; 
+
+  
+}
+.checkout-btn:hover {
+    background-color: black;
+    color:orange;
+}
+
+.checkout-container {
+    order: 1;
+}
+
+.summary-container {
+    order: 2;
+}
+
+
+
+
 .delivery-address {
     margin: 20px auto;
-    width: 50%;
+    width: 80%;
     padding: 20px;
     border: 1px solid #ccc;
+    border-radius: 10px;
+}
+.delivery-address p {
+    text-align: left;
 }
 .purchase-order {
     margin: 20px auto;
     border-collapse: collapse;
-    width: 50%;
+    width: 100%;
+    
 }
 .purchase-order th, .purchase-order td {
     border: 1px solid #ccc;
@@ -1178,31 +1260,129 @@ cursor: pointer;
     width: 50%;
     padding: 20px;
     border: 1px solid #ccc;
+    border-radius: 10px;
+    width: 80%; 
 }
 .payment-buttons {
     display: none;
     justify-content: center;
     margin-top: 10px;
+    
 }
 .payment-button {
-    background-color: #4CAF50;
+    background-color: black;
     color: white;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
     margin: 0 10px;
+    
 }
 .select-payment-button {
-    background-color: #3498db;
+    background-color: black;
     color: white;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
 }
+
+.payment-button:hover {
+    background-color: orange;
+}
+.select-payment-button:hover {
+    background-color: orange;
+}
+
 .payment-details {
     margin-top: 20px;
-    text-align: center;
+    margin-bottom: 10px;
+    text-align: left;
+
+ 
+    padding: 15px; /* Adjust padding to control the inner spacing */
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    max-width: 500px; /* Set a maximum width for the container */
+    margin: 0 auto; /* Center the container horizontally */
+    
 }
+
+.order-message {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    width: 80%;
+    margin: 0 auto;
+    border-radius: 10px;
+}
+
+.order-message label {
+    display: block;
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    
+}
+
+.order-message textarea {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none; /* Disable textarea resizing */
+}
+
+.voucher-container {
+    margin-top: 20px;
+    padding: 15px; /* Adjust padding to control the inner spacing */
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    width: 80%;
+    margin: 0 auto; /* Center the container horizontally */
+    border-radius: 10px;
+}
+
+.voucher-container h2 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    color: black;
+}
+
+.voucher-label {
+    display: flex;
+    align-items: center; /* Align items vertically in the flex container */
+    margin-bottom: 15px;
+    font-size: 1.4em;
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 5px;
+    background-color: #ecf0f1;
+    transition: background-color 0.3s ease;
+}
+
+.voucher-label:hover {
+    background-color: #d6eaf8;
+}
+
+.voucher-label input {
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.voucher-code {
+    font-weight: bold;
+    margin-right: auto;
+    margin-top: 13px ;
+}
+
+.voucher-amount {
+    color: #e74c3c;
+    margin-right: auto;
+    margin-top: 13px ;
+}
+
+
 
 /*notifications page*/
 

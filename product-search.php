@@ -126,8 +126,10 @@
                     $price = $row['price'];
                     $image_name = $row['image_path'];
                     ?>
+                    
                     <div class="bikelist">
                         <div class="bikes">
+                            <br>
                             <?php
                             // Display product image
                             if ($image_name == "")
@@ -140,8 +142,8 @@
                                 echo '</a>';
                             }
                             ?>
-                            <h2>Product Name: <?php echo $title; ?></h2>
-                            <p>Description: <?php echo $description; ?></p>
+                            <h2><?php echo $title; ?></h2>
+                            <p>PHP<?php echo $price;?></p>
                         </div>
                     </div>
                     <?php

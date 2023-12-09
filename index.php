@@ -101,7 +101,7 @@
 
   
    
-     
+        <br>   
         <div class="bikelist-container clearfix" id="product-list">
         <br><br><br><br>
         <h1> Featured Bikes</h1>
@@ -110,10 +110,13 @@
 
         <?php
 
+        $currentTime = date('Y-m-d H:i:s');
+        
+
         $sql = "SELECT pl.*, MAX(sl.quantity) AS stock_quantity, d.discount_percentage
         FROM product_list pl 
         LEFT JOIN stock_list sl ON pl.id = sl.product_id 
-        LEFT JOIN discounts d ON pl.id = d.product_id AND NOW() BETWEEN d.start_time AND d.end_time
+        LEFT JOIN discounts d ON pl.id = d.product_id  AND (d.end_time IS NULL OR d.end_time >= '$currentTime')
         WHERE pl.status = '1'
         GROUP BY pl.id, pl.name, pl.description, pl.image_path, pl.price, d.discount_percentage";
 
