@@ -6,7 +6,7 @@ if (!isset($_SESSION['userLoggedIn'])) {
     exit();
 }
 ?>
-<br><br><br><br><br>
+<br><br><br>
 <body style="text-align: center"; >
 
 <?php
@@ -17,8 +17,10 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
    
 
     ?>
+    <div class="cart-container">
+    <br><br><br><br>
     <h1>Shopping Cart</h1>
-    <br>
+    <br><br><br>
 
     <table class="add-to-cart">
         <tr>
@@ -137,13 +139,14 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
             <td></td>
         </tr>
     </table>
-
+    
+    <br><br><br>
     <a class="checkout-button" href="<?php echo SITEURL; ?>checkout.php?client_id=<?php echo $client_id; ?>&cart_id=<?php echo $cart_id; ?>">Checkout</a>
 
 
         
 
-
+    </div>
 
 
     <br>

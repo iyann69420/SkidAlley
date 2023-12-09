@@ -64,8 +64,9 @@ require 'vendor/autoload.php';?>
 
 
 <body>
+    <div class="signup-container">
     <div class="signuppage">
-        <title> Signup </title>
+        <title> Register </title>
         <link rel="stylesheet" href="style.css">
 
         <?php
@@ -101,15 +102,15 @@ require 'vendor/autoload.php';?>
  
 
         <form action="" method="POST" name="signup">
-        <br>
-        <a href="index.php"> <img style="width: 100px" src="images/logo.png"> </a>
-        <h1> Sign Up </h1>
-        <br>
-        <input type="text" name="username" placeholder="Username" value="<?php echo isset($_POST['username']) ? $_POST['username'] : ''; ?>">
-        <input type="text" name="fullname" placeholder="Full name" value="<?php echo isset($_POST['fullname']) ? $_POST['fullname'] : ''; ?>">
-        <input type="number" name="contact" placeholder="Contact" value="<?php echo isset($_POST['contact']) ? $_POST['contact'] : ''; ?>">
-        <input type="text" name="address" placeholder="Home address" value="<?php echo isset($_POST['address']) ? $_POST['address'] : ''; ?>">
-        <input type="email" name="email" placeholder="E-mail address" value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>">
+            <br>
+            <a href="index.php"> <img style="width: 200px" src="images/logo.png"> </a>
+            <h1> Register your Account </h1>
+            <br>
+            <input type="text" name="username" placeholder="Username" value="<?php echo isset($_POST['username']) ? $_POST['username'] : ''; ?>">
+            <input type="text" name="fullname" placeholder="Full name" value="<?php echo isset($_POST['fullname']) ? $_POST['fullname'] : ''; ?>">
+            <input type="number" name="contact" placeholder="Contact" value="<?php echo isset($_POST['contact']) ? $_POST['contact'] : ''; ?>">
+            <input type="text" name="address" placeholder="Home address" value="<?php echo isset($_POST['address']) ? $_POST['address'] : ''; ?>">
+            <input type="email" name="email" placeholder="E-mail address" value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>">
 
                 <div class="password-container">
             <input type="password" name="password" id="password" class="password-input" placeholder="Password">
@@ -119,17 +120,21 @@ require 'vendor/autoload.php';?>
         </div>
 
     <!-- Confirm Password input field with the eye icon inside the text box -->
-    <div class="password-container">
-        <input type="password" name="confirm_password" id="confirm_password" class="password-input" placeholder="Confirm Password">
-        <span class="password-icon" onclick="togglePassword('confirm_password', 'toggleConfirmPasswordIcon')">
-            <i id="toggleConfirmPasswordIcon" class="fa fa-eye-slash" aria-hidden="true"></i>
-        </span>
-    </div>
-        
-        <input type="submit" name="submit" value="Submit" name="signup" > 
-        </form>
-    </div>
+        <div class="password-container">
+            <input type="password" name="confirm_password" id="confirm_password" class="password-input" placeholder="Confirm Password">
+            <span class="password-icon" onclick="togglePassword('confirm_password', 'toggleConfirmPasswordIcon')">
+                <i id="toggleConfirmPasswordIcon" class="fa fa-eye-slash" aria-hidden="true"></i>
+            </span>
+        </div>
+            
+            <input type="submit" name="submit" value="Submit" name="signup" > 
+            </form>
+        </div>
 
+        
+     
+    </div>
+    </div>
 </html>
 
 <?php

@@ -333,6 +333,19 @@ input {
 
 
 /* SIGNUP.HTML */
+.signup-container{
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center the container vertically */
+    width: 500px; /* Adjust the container width as needed */
+    height: 900px; /* Adjust the container height as needed */
+    background-color: white; /* Set a light gray background color */
+    border-radius: 10px; /* Set border-radius to create rounded corners */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+    margin: 50px auto; /* Adjust margin as needed */
+
+
+}
 .signuppage {
     display: flex;
     flex-direction: column;
@@ -371,19 +384,20 @@ input {
     color: white;
     padding: 8px 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 20px; /* Make edges round, adjust as needed */
     cursor: pointer;
     text-align: center;
-    width: 120px; /* Adjust the width as needed */
-    height: 30px;
+    width: 420px; /* Adjust the width as needed */
+    height: 40px;
+    font-size: 16px;
 }
+
 
 .signuppage input[type="submit"]:hover {
     background-color: darkorange;
     color: black;
     border-color: black;
-    width: 120px; /* Adjust the width as needed */
-    height: 30px; 
+   
 }
 
  /* Add some styling to position the eye icon */
@@ -709,6 +723,13 @@ cursor: pointer;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+.logsignbuttons input[type="submit"] {
+    padding: 10px 20px; /* Adjust padding as needed */
+    margin-top: 10px; /* Adjust margin-top as needed */
+    margin-bottom: 10px; /* Add bottom margin */
+    display: block;
+    margin: 0 auto;
+}
 
 .loginpage input[type="submit"] {
     background-color: black;
@@ -719,18 +740,19 @@ cursor: pointer;
     margin-top: 10px; /* Adjust margin for spacing */
     display: flex;
     justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
-    text-align: center;
     cursor: pointer;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-    font-size: 16px;
-    line-height: 1;
+    font-size: 20px;
+    line-height: 0;
+    width: 230px;
+    
 }
 
 .loginpage input[type="submit"]:hover {
     background-color: darkorange;
     color: black;
     border-color: black;
+    
 }
 
 /* Additional styles for the container and other elements */
@@ -738,8 +760,20 @@ cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center; /* Center the container vertically */
-    height: 100vh; /* Adjust the container height as needed */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add box shadow */
+    width: 500px; /* Adjust the container width as needed */
+    height: 700px; /* Adjust the container height as needed */
+    background-color: white; /* Set a light gray background color */
+    border-radius: 10px; /* Set border-radius to create rounded corners */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); 
+    margin: 50px auto; /* Adjust margin as needed */
+    
+}
+.loginpage {
+    padding: 20px;
+}
+.loginimage{
+  margin-top: -60px;
+  margin-bottom: 80px;
 }
 
 .login-container .loginpage {
@@ -970,6 +1004,17 @@ cursor: pointer;
 }
 
 /* Add to cart */
+.cart-container{
+    margin-top: 10px;
+    width: 1000px; /* Adjust the container width as needed */
+    height: 900px; /* Adjust the container height as needed */
+    background-color: white; /* Set a light gray background color */
+    border-radius: 10px; /* Set border-radius to create rounded corners */
+    box-shadow: 0 12px 16px rgba(0, 0, 0, 0.2);
+    margin: 50px auto; /* Adjust margin as needed */
+    
+
+}
 
 .add-to-cart {
     width: 50%;
@@ -1168,6 +1213,7 @@ cursor: pointer;
     
 }
 .notification-container {
+    
     background-color: white;
     border: 1px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

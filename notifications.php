@@ -21,12 +21,15 @@ if (!isset($_SESSION['userLoggedIn'])) {
 </style>
 <body>
     <header>
-        <h1>Notification </h1>
-        <br>
+        
+      
     </header>
     
     <main>
     <div class="notification-container">
+        <br><br>
+    <h1>Notification </h1>
+    <br><br>
         <?php
         // Assuming you have already established a database connection
         // Perform a SELECT query to fetch notifications

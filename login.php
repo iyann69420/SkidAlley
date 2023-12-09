@@ -18,7 +18,7 @@
     </script>
 </head>
 <body>
-<div class="login-container">
+    <div class="login-container">
         <div class="loginpage">
             <?php
             if (isset($_SESSION['no-login-message'])) {
@@ -31,7 +31,10 @@
             }
             ?>
             <form action="" method="POST" name="login">
+                <div class="loginimage">
                 <a href="home.php"> <img style="width: 300px" src="images/logo.png"> </a>
+                </div>
+                
                 <input type="text" name="username" placeholder="Username" <?php if(isset($_SESSION['login'])) echo "style='border: 1px solid red;'"; ?>>
                 <input type="password" name="password" placeholder="Password" <?php if(isset($_SESSION['login'])) echo "style='border: 1px solid red;'"; ?>>
                 <div class="logsignbuttons">
@@ -42,13 +45,13 @@
                 </div>
             </form>
         </div>
+        
     </div>
-    <div class="footer sticky-footer">
-        <p>2023 Skid Alley Bike Shop. All rights reserved.</p>
-    </div>
+    
 </body>
 </html>
 
+<?php include('partials-front/footer.php'); ?>
 <?php
 if (isset($_POST['submit'])) {
     $username = $_POST['username'];
