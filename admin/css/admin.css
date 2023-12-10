@@ -199,10 +199,14 @@ table tr td{
     }
 
 /* CSS for main content */
-.main-content{
+.main-content {
     background-color: #f1f2f6;
-    padding: 3% 0 ;
-}
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    margin: 20px;
+    padding: 20px;
+  }
+  
 
 .col-4{
     width: 18%;
@@ -220,17 +224,13 @@ table tr td{
 
 
 
-.footer{
+.footer {
     color: white;
     background-color: black;
-    padding: 10px; /
-  
-
-
-
-    
-    
-}
+    padding: 10px;
+    width: 100%;
+    margin-top: 500px;
+  }
 
 
 
@@ -391,7 +391,7 @@ input[type="submit"].btn-secondary:hover {
     margin-bottom: 20px;
 }
 .logout-button {
-    position: fixed;
+    
     bottom: 20px;
     left: 20px;
     /* Adjust the positioning as needed */

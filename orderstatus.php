@@ -91,7 +91,7 @@
                         1 => 'Packed',
                         2 => 'For Delivery',
                         3 => 'On the Way',
-                        4 => 'Delivered',
+                         4 => ($paymentMethod === 'Pickup') ? 'Pickup' : 'Delivered',
                         5 => 'Cancelled',
                         
                     ];

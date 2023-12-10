@@ -14,7 +14,7 @@
         }
 
         if(isset($_SESSION['delete']))
-        {
+        {   
             echo $_SESSION['delete'];
             unset($_SESSION['delete']);
         }
@@ -38,6 +38,22 @@
         <br><br>
         <a href="<?php echo SITEURL; ?>admin/add-product-list.php" class="btn-primary">Add Product</a>
         <br/><br/><br/>
+        <div class="search-form">
+        <form id="search-form" method="GET" action="<?php echo SITEURL; ?>admin/product-list.php">
+        <input type="text" id="search" name="search" placeholder="Search by product name">
+        <select id="filter_category" name="filter_category">
+            <option value="">All Categories</option>
+            <?php
+            // Fetch categories from the database and populate the dropdown
+            $category_query = "SELECT * FROM categories";
+            $category_result = mysqli_query($conn, $category_query);
+            while ($category_row = mysqli_fetch_assoc($category_result)) {
+                echo "<option value='{$category_row['id']}'>{$category_row['category']}</option>";
+            }
+            ?>
+        </select>
+    </form>
+</div>
 
         <table class="tbl-full">
             <tr>
@@ -53,7 +69,13 @@
             </tr>
 
             <?php
-            $sql = "SELECT * FROM product_list";
+            $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+            $filterCategory = isset($_GET['filter_category']) ? mysqli_real_escape_string($conn, $_GET['filter_category']) : '';
+            
+            $sql = "SELECT * FROM product_list WHERE 
+                    (name LIKE '%$search%' OR models LIKE '%$search%' OR description LIKE '%$search%') 
+                    AND ('$filterCategory' = '' OR category_id = '$filterCategory')";
+            
             $res = mysqli_query($conn, $sql);
             $count = mysqli_num_rows($res);
             $sn = 1;
@@ -132,5 +154,39 @@
         </table>
     </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Attach an input event to the search input
+        $('#search').on('input', function() {
+            // Get the search input value
+            var searchValue = $(this).val();
+
+            // Get the selected category filter value
+            var filterCategory = $('#filter_category').val();
+
+            // Send an AJAX request to fetch filtered results
+            $.ajax({
+                type: 'GET',
+                url: 'product-search.php',
+                data: { search: searchValue, filter_category: filterCategory },
+                success: function(response) {
+                    // Update the product list with the filtered results
+                    $('.tbl-full tbody').html(response);
+                }
+            });
+        });
+
+        // Attach a change event to the category filter dropdown
+        $('#filter_category').on('change', function() {
+            // Automatically submit the form when the category changes
+            $('#search-form').submit();
+        });
+    });
+</script>
+
+
+
 
 <?php include('partials/footer.php'); ?>

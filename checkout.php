@@ -288,6 +288,7 @@ $deliveryOption = '';
             <div><strong>Address:</strong> ${deliveryAddress.address}</div>
             ${paymentMethod === 'Cash on Delivery' ? `<div><strong>Additional Fee (Shipping):</strong> ₱${additionalFee}</div>` : ''}
             <div><strong>Total Price:</strong> ${formattedTotalWithFee}</div>
+            ${paymentMethod === 'Gcash' ? `<div><em>Please note: Payment will be done upon checkout.</em></div>` : ''}
         `;
 
 

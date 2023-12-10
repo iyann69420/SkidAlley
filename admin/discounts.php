@@ -1,4 +1,23 @@
-<?php include ('partials/menu.php');?>
+<?php include ('partials/menu.php');
+
+if (isset($_SESSION['add'])) 
+{
+    echo $_SESSION['add'];
+    unset($_SESSION['add']);
+}
+if(isset($_SESSION['delete']))
+{
+    echo $_SESSION['delete'];
+    unset($_SESSION['delete']);
+}
+if(isset($_SESSION['update']))
+{
+    echo $_SESSION['update'];
+    unset($_SESSION['update']);
+}
+
+?>
+
 
 <div class = "main-content">
            <div class = "wrapper">
