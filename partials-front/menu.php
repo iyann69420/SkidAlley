@@ -111,8 +111,8 @@ if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn'] === true) {
 
 
         <div class="navbar">
-            <a href="<?php echo SITEURL; ?>home.php"> <p> Home </p> </a>
-            <a href="<?php echo SITEURL; ?>index.php"> <p> Catalog </p> </a>
+            <a href="<?php echo SITEURL; ?>index.php"> <p> Home </p> </a>
+            <a href="<?php echo SITEURL; ?>catalog.php"> <p> Catalog </p> </a>
             <!-- <a href="<?php echo SITEURL; ?>services.php"> <p> Service </p> </a> -->
 
             <a href="<?php echo SITEURL; ?>about.php"> <p> About </p> </a>

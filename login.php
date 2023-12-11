@@ -73,7 +73,7 @@ if (isset($_POST['submit'])) {
 
             $user_data = mysqli_fetch_assoc($res);
             $_SESSION['client_id'] = $user_data['id'];
-            header('location:' . SITEURL . 'home.php');
+            header('location:' . SITEURL . 'index.php');
             exit(); 
         } else {
             $_SESSION['login'] = "<div class='error text-center'>Username or Password did not match</div>";

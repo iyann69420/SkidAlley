@@ -43,7 +43,7 @@
                 $ext = pathinfo($image_name, PATHINFO_EXTENSION);
                 $image_name = "Logo-" . rand(0000, 9999) . "." . $ext;
                 $src = $_FILES['image']['tmp_name'];
-                $dst = "../images/logo/" . $image_name;
+                $dst = $_SERVER['DOCUMENT_ROOT'] . "/images/reviews/" . $image_name;
 
                 if(move_uploaded_file($src, $dst))
                 {

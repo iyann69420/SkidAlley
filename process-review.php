@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (isset($_FILES['image'])) {
                 $uploadedImage = $_FILES['image'];
-                $uploadPath = __DIR__ . '../images/reviews/';
+                $uploadPath = 'C:/xampp/htdocs/SkidAlley/images/reviews/';
                 $ext = pathinfo($uploadedImage['name'], PATHINFO_EXTENSION);
                 $image_name = "Review-" . rand(0000, 9999) . "." . $ext;
                 $dst = $uploadPath . $image_name;

@@ -184,9 +184,12 @@
                                             1 => ['text' => 'Packed', 'icon' => 'fa-archive'],
                                             2 => ['text' => 'For Delivery', 'icon' => 'fa-user'],
                                             3 => ['text' => 'On the Way', 'icon' => 'fa-truck'],
-                                            4 => ['text' => 'Delivered', 'icon' => 'fa-check'],
-                                        
+                                            4 => [
+                                                'text' => ($paymentMethod === 'Pickup') ? 'Pickup' : 'Delivered',
+                                                'icon' => 'fa-check'
+                                            ],
                                         ];
+                                        
 
                                         // Get the status value from your database, assuming it's stored in $status
                                         $statusFromDatabase = $row['status']; // You need to fetch the status from your database here.
