@@ -1,5 +1,7 @@
 <?php
 include('partials/menu.php');
+
+
 ?>
 
 <!-- Include the Summernote CSS -->

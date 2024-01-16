@@ -4,6 +4,23 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
 <br><br><br><br><br><br>
 
+<style>
+    .ratings-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .average-stars,
+    .total-sold {
+        display: inline-block;
+        margin-right: 10px; /* Adjust the margin as needed */
+    }
+
+    .average-stars {
+        font-size: 18px;
+        color: gold; /* Star color */
+    }
+</style>
 <body>
     
     <style>
@@ -86,60 +103,17 @@
         </form>
     </div>
 
-    <div class="bikeset-section">
-        <h2>Bike Set</h2>
-            <br><br>
-            <div class="bikeset-products">
-                <?php
-                // Define the category name for "Bike Set"
-                $bikesetCategoryName = "Bike Set"; // Replace with the actual category name
-
-                // Retrieve the category ID for "Bike Set" from the categories table
-                $sqlCategory = "SELECT id FROM categories WHERE category = '$bikesetCategoryName'";
-                $resCategory = mysqli_query($conn, $sqlCategory);
-
-                if ($resCategory && mysqli_num_rows($resCategory) > 0) {
-                    $categoryRow = mysqli_fetch_assoc($resCategory);
-                    $bikesetCategoryId = $categoryRow['id'];
-
-                    // Your SQL query to select products only in the "Bike Set" category
-                    $sql = "SELECT * FROM product_list WHERE category_id = $bikesetCategoryId";
-                    $res = mysqli_query($conn, $sql);
-
-                    if ($res && mysqli_num_rows($res) > 0) {
-                        while ($bikeset_product = mysqli_fetch_assoc($res)) {
-                            ?>  <div class="bikeset-product">
-                            <a href="product-details.php?id=<?php echo $bikeset_product['id']; ?>">
-                                <img src="<?php echo SITEURL; ?>images/bike/<?php echo $bikeset_product['image_path']; ?>"
-                                        alt="<?php echo $bikeset_product['name']; ?>"
-                                        style="width: 150px;">
-                                <h3><?php echo $bikeset_product['name']; ?></h3>
-                                <p>Price: <?php echo number_format($bikeset_product['price'], 2); ?></p>
-                                
-                            </a>
-                        </div>
-                        <?php
-                        }
-                    } else {
-                        echo "<p>No BikeSet products available.</p>";
-                    }
-                } else {
-                    echo "<p>'Bike Set' category not found.</p>";
-                }
-
-                ?>
-
-                    
-            </div>
-    </div>
-
     <?php
 $currentTime = date('Y-m-d H:i:s');
-$discountedProductsSql = "SELECT pl.*, d.discount_percentage
+$discountedProductsSql = "SELECT pl.*, d.discount_percentage, AVG(r.stars) AS average_stars, COALESCE(SUM(op.quantity), 0) AS total_sold
                         FROM product_list pl
                         JOIN discounts d ON pl.id = d.product_id
+                        LEFT JOIN order_products op ON pl.id = op.product_id
+                        LEFT JOIN order_list ol ON op.order_id = ol.id
+                        LEFT JOIN reviews r ON ol.id = r.order_id
                         WHERE d.discount_percentage > 0
-                          AND (d.end_time IS NULL OR d.end_time >= '$currentTime')";
+                          AND (d.end_time IS NULL OR d.end_time >= '$currentTime')
+                        GROUP BY pl.id, pl.name, pl.description, pl.image_path, pl.price, d.discount_percentage";
 $discountedProductsResult = mysqli_query($conn, $discountedProductsSql);
 ?>
 
@@ -153,6 +127,8 @@ $discountedProductsResult = mysqli_query($conn, $discountedProductsSql);
                 $price = $discountedProduct['price'];
                 $discountPercentage = $discountedProduct['discount_percentage'];
                 $discountedPrice = $price - ($price * $discountPercentage / 100);
+                $averageStars = round($discountedProduct['average_stars'], 1);
+                $totalSold = $discountedProduct['total_sold'];
         ?>
                 <div class="discounted-product">
                     <a href="product-details.php?id=<?php echo $discountedProduct['id']; ?>">
@@ -167,6 +143,16 @@ $discountedProductsResult = mysqli_query($conn, $discountedProductsSql);
                         } else {
                             echo "<p class='price'>Price: ₱" . number_format($price) . "</p>";
                         }
+                        echo "<p class='average-stars'> ";
+                        for ($i = 1; $i <= 5; $i++) {
+                            if ($i <= $averageStars) {
+                                echo "★"; // Full star
+                            } else {
+                                echo "☆"; // Empty star
+                            }
+                        }
+                        echo "</p>";
+                        echo "<p class='total-sold'>$totalSold sold</p>";
                         ?>
                     </a>
                 </div>
@@ -179,6 +165,82 @@ $discountedProductsResult = mysqli_query($conn, $discountedProductsSql);
     </div>
 </div>
 
+
+
+
+
+    <?php
+$sqlAllCategories = "SELECT * FROM categories";
+$resAllCategories = mysqli_query($conn, $sqlAllCategories);
+
+if ($resAllCategories && mysqli_num_rows($resAllCategories) > 0) {
+    while ($categoryRow = mysqli_fetch_assoc($resAllCategories)) {
+        $categoryId = $categoryRow['id'];
+        $categoryName = $categoryRow['category'];
+
+        // Your SQL query to select products for the current category
+        $sqlProducts = "SELECT pl.*, AVG(r.stars) AS average_stars, COUNT(DISTINCT ol.id) AS total_sold
+                        FROM product_list pl
+                        LEFT JOIN order_products op ON pl.id = op.product_id
+                        LEFT JOIN order_list ol ON op.order_id = ol.id AND ol.status = 4
+                        LEFT JOIN reviews r ON ol.id = r.order_id
+                        WHERE pl.category_id = $categoryId
+                        GROUP BY pl.id, pl.name, pl.description, pl.image_path, pl.price";
+
+        $resProducts = mysqli_query($conn, $sqlProducts);
+
+        if ($resProducts && mysqli_num_rows($resProducts) > 0) {
+            ?>
+            <div class="bikeset-section">
+                <h2><?php echo $categoryName; ?> Set</h2>
+                <br><br>
+                <div class="bikeset-products">
+                    <?php
+                    while ($product = mysqli_fetch_assoc($resProducts)) {
+                        $averageStars = round($product['average_stars'], 1);
+                        $totalSold = $product['total_sold'];
+                        ?>
+                        <div class="bikeset-product">
+                            <a href="product-details.php?id=<?php echo $product['id']; ?>">
+                                <img src="<?php echo SITEURL; ?>images/bike/<?php echo $product['image_path']; ?>"
+                                     alt="<?php echo $product['name']; ?>"
+                                     style="width: 150px;">
+                                <h3><?php echo $product['name']; ?></h3>
+                                <p>Price: <?php echo number_format($product['price'], 2); ?></p>
+                                <p class='average-stars'> 
+                                    <?php
+                                    for ($i = 1; $i <= 5; $i++) {
+                                        if ($i <= $averageStars) {
+                                            echo "★"; // Full star
+                                        } else {
+                                            echo "☆"; // Empty star
+                                        }
+                                    }
+                                    ?>
+                                </p>
+                                <p class='total-sold'><?php echo $totalSold; ?>sold</p>
+                            </a>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+            </div>
+            <?php
+        } else {
+           
+        }
+    }
+} else {
+    echo "<p>No categories found.</p>";
+}
+?>
+
+                    
+            </div>
+    </div>
+
+  
 
     
 

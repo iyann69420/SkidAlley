@@ -1,25 +1,30 @@
 <?php
-// get-notification-count.php
-
-include('../config/constants.php'); // Adjust the path if needed
 
 
+include('../config/constants.php'); 
+
+function getNotificationCount($conn) {
+   
+    $query = "SELECT COUNT(*) as count FROM admin_notifications WHERE is_read = 0";
+    $result = mysqli_query($conn, $query);
+
+    if ($result) {
+        $row = mysqli_fetch_assoc($result);
+        return $row['count'];
+    } else {
+        return "Error fetching notification count";
+    }
+}
 
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Fetch the notification count from the database
-$query = "SELECT COUNT(*) as count FROM admin_notifications WHERE is_read = 0";
-$result = mysqli_query($conn, $query);
 
-if ($result) {
-    $row = mysqli_fetch_assoc($result);
-    echo $row['count'];
-} else {
-    echo "Error fetching notification count";
-}
+$notificationCount = getNotificationCount($conn);
 
-// Close the database connection
 mysqli_close($conn);
+
+
+echo $notificationCount;
 ?>

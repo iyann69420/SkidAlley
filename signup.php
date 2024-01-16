@@ -18,6 +18,8 @@ require 'vendor/autoload.php';?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/css/themes/default.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
 
+  
+
     
 
 
@@ -42,6 +44,42 @@ require 'vendor/autoload.php';?>
         transform: translateY(-50%);
         cursor: pointer;
     }
+
+
+#agreeTermsLabel a {
+
+    color: #3498db; /* Adjust the color as needed */
+    text-decoration: none;
+}
+
+#agreeTermsLabel a:hover {
+    text-decoration: underline; /* Add underline on hover */
+    
+}
+ 
+#agree_terms {
+    margin-right: 10px; /* Adjust as needed to add space between checkbox and text */
+}
+
+#agreeTermsLabel {
+    display: inline-block; /* Use inline-block to keep elements in a straight line */
+}
+
+
+#agreeTermsLabel a {
+    color: #3498db; /* Adjust the color as needed */
+    text-decoration: none;
+}
+
+#agreeTermsLabel a:hover {
+    text-decoration: underline; /* Add underline on hover */
+}
+
+.terms-checkbox{
+display: flex;
+}
+
+   
 </style>
 
 <script>
@@ -62,7 +100,6 @@ require 'vendor/autoload.php';?>
 
 
 
-
 <body>
     <div class="signup-container">
     <div class="signuppage">
@@ -71,29 +108,35 @@ require 'vendor/autoload.php';?>
 
         <?php
 
-        if(isset($_SESSION['password_mismatch']))
-        {
-            echo $_SESSION['password_mismatch'];
-            unset($_SESSION['password_mismatch']);
-        }
-        if(isset($_SESSION['empty']))
-        {
-            echo $_SESSION['empty'];
-            unset($_SESSION['empty']);
-        }
-        if(isset($_SESSION['blank']))
-        {
-            echo $_SESSION['blank'];
-            unset($_SESSION['blank']);
-        }
-        if (isset($_SESSION['email_exists'])) {
-            echo $_SESSION['email_exists'];
-            unset($_SESSION['email_exists']);
-        }
-        if (isset($_SESSION['contact_error'])) {
-            echo $_SESSION['contact_error'];
-            unset($_SESSION['contact_error']);
-        }
+if(isset($_SESSION['password_mismatch']) || isset($_SESSION['empty']) || isset($_SESSION['blank']) || isset($_SESSION['email_exists']) || isset($_SESSION['username_invalid']) || isset($_SESSION['fullname_invalid'])) {
+    echo "<script>";
+    if(isset($_SESSION['password_mismatch'])) {
+        echo "alertify.error('{$_SESSION['password_mismatch']}');";
+        unset($_SESSION['password_mismatch']);
+    }
+    if(isset($_SESSION['empty'])) {
+        echo "alertify.error('{$_SESSION['empty']}');";
+        unset($_SESSION['empty']);
+    }
+    if(isset($_SESSION['blank'])) {
+        echo "alertify.error('{$_SESSION['blank']}');";
+        unset($_SESSION['blank']);
+    }
+    if(isset($_SESSION['email_exists'])) {
+        echo "alertify.error('{$_SESSION['email_exists']}');";
+        unset($_SESSION['email_exists']);
+    }
+    if(isset($_SESSION['username_invalid'])) {
+        echo "alertify.error('{$_SESSION['username_invalid']}');";
+        unset($_SESSION['username_invalid']);
+    }
+    if(isset($_SESSION['fullname_invalid'])) {
+        echo "alertify.error('{$_SESSION['fullname_invalid']}');";
+        unset($_SESSION['fullname_invalid']);
+    }
+    echo "</script>";
+}
+        
 
 
         ?>
@@ -125,17 +168,39 @@ require 'vendor/autoload.php';?>
             <span class="password-icon" onclick="togglePassword('confirm_password', 'toggleConfirmPasswordIcon')">
                 <i id="toggleConfirmPasswordIcon" class="fa fa-eye-slash" aria-hidden="true"></i>
             </span>
+                  
         </div>
+
+
+        <div class="terms-checkbox">
+            <input type="checkbox" id="agree_terms" name="agree_terms" required>
+            <div class="terms">
+
+           
+                <label for="agree_terms" id="agreeTermsLabel">
+                    <span>I agree to the </span>
+                    <a href="terms_and_conditions.php" target="_blank">Terms and Conditions</a>
+                </label>
+            </div>
+        </div>
+        
             
-            <input type="submit" name="submit" value="Submit" name="signup" > 
+            <input type="submit" name="submit" value="Submit" name="signup"> 
+          
             </form>
         </div>
 
         
+        
      
     </div>
     </div>
+
+    
+    
 </html>
+
+
 
 <?php
 if(isset($_POST['submit']))
@@ -155,6 +220,19 @@ if(isset($_POST['submit']))
         header("location: signup.php");
         exit;
     }
+
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $_POST['username'])) {
+        $_SESSION['username_invalid'] = "Invalid characters in the username. Use only letters, numbers, and underscores.";
+        header("location: signup.php");
+        exit;
+    }
+    
+    if (!preg_match('/^[a-zA-Z\s]+$/', $_POST['fullname'])) {
+        $_SESSION['fullname_invalid'] = "Invalid characters in the full name. Use only letters and spaces.";
+        header("location: signup.php");
+        exit;
+    }
+
     $email = $_POST['email'];
     $check_email_query = "SELECT * FROM client_list WHERE email = '$email'";
     $check_email_result = mysqli_query($conn, $check_email_query);
@@ -275,4 +353,6 @@ if(isset($_POST['submit']))
 
 
 ?>
+
+
 <?php include('partials-front/footer.php'); ?>

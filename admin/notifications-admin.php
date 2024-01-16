@@ -66,6 +66,21 @@
   .view-order-button:hover {
     background-color: orange;
   }
+  .delete-notification-button {
+    margin-top: 5px;
+    background-color: black;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.delete-notification-button:hover {
+    background-color: orange;
+    color: white;
+}
 </style>
 <div class="main-content">
     <div class="wrapper">
@@ -96,15 +111,20 @@
                         $notificationType = "Purchase Order";
                     } elseif ($isApproved == 2) {
                         $notificationType = "Order Received";
-                    } elseif ($isApproved == 3) {
+                    } 
+                    elseif ($isApproved == 3) {
                         $notificationType = "Confirming Payment";
-                    } else {
+                    }
+                    elseif ($isApproved == 4) {
+                        $notificationType = "Review Pending";
+                    }
+                    
+                    else {
                         continue;
                     }
                     ?>
                     <div class="notifications">
-                        <div class="<?php echo $notificationClass; ?>"
-                             onclick="showAlertify('<?php echo $message; ?>', '<?php echo $reason; ?>', '<?php echo $timestamp; ?>', '<?php echo $order_id; ?>', '<?php echo $notificationId; ?>', '<?php echo $isApproved; ?>')">
+                    <div class="<?php echo $notificationClass; ?>" onclick="showAlertify('<?php echo $message; ?>', '<?php echo $reason; ?>', '<?php echo $timestamp; ?>', '<?php echo $order_id; ?>', '<?php echo $notificationId; ?>', '<?php echo $isApproved; ?>')">
                             <h3><?php echo $notificationType; ?></h3>
                             <?php if ($isApproved == 0) : ?>
                                 <p>There is a cancelled order. The reason is: <strong><?php echo $reason; ?></strong></p>
@@ -114,8 +134,13 @@
                                 <p>Order has been received.</p>
                             <?php elseif ($isApproved == 3) : ?>
                                 <p>Confirming payment for order: <strong><?php echo $order_id; ?></strong></p>
+                            <?php elseif ($isApproved == 4) : ?>
+                                <p>Pending Review: <strong><?php  ?></strong></p>
                             <?php endif; ?>
                             <span class="notification-date"><?php echo $timestamp; ?></span>
+                            <button class="delete-notification-button" onclick="deleteNotification(event, '<?php echo $notificationId; ?>')">Delete</button>
+
+                            
                         </div>
                     </div>
                     <?php
@@ -136,6 +161,30 @@
 <audio id="notificationSound" src="/SkidAlley/audio/notification.mp3"></audio>
 
 <script>
+  function deleteNotification(event, notificationId) {
+    // Stop the event propagation to prevent triggering showAlertify
+    event.stopPropagation();
+
+    // Make an AJAX call to delete the notification
+    $.ajax({
+        type: 'POST',
+        url: 'delete-notification.php',
+        data: {
+            notification_id: notificationId
+        },
+        success: function (response) {
+            console.log('Notification deleted');
+            
+            // Refresh the page after successful deletion
+            location.reload();
+        },
+        error: function (error) {
+            console.error('Error deleting notification', error);
+        }
+    });
+}
+
+
 function showAlertify(message, reason, timestamp, order_id, notification_id, isApproved) {
     var notificationType = isApproved == 0 ? 'Cancellation of Order' : 'Purchase Order';
 
@@ -176,8 +225,14 @@ function showAlertify(message, reason, timestamp, order_id, notification_id, isA
       return 'There is a purchase order.';
     } else if (isApproved == 2){
       return 'Order has been recieve.';
-    } else if (isApproved == 3){
+    } 
+    else if (isApproved == 3){
       return 'Confirming Payment';
+      
+    } 
+    else if (isApproved == 4){
+      return 'There is a Review';
+      
     } 
     else {
       return ''; // Handle other cases if needed

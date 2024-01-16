@@ -236,7 +236,7 @@ mysqli_close($conn);
 
         <!-- Image Upload -->
         <label for="image">Upload Image:</label>
-        <input type="file" name="image" accept="image/*" required>
+        <input type="file" name="image" accept="image/*" >
         <br>
         <img id="image-preview" alt="Image Preview" style="width: 200px; display: none;">
         <br>
@@ -258,6 +258,8 @@ mysqli_close($conn);
         <textarea name="review" rows="4" required></textarea>
         <br>
 
+       
+
         <!-- Submit Button -->
         <input type="submit" value="Submit Review">
        
@@ -276,6 +278,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     // Move the uploaded file to the upload directory
     $uploadSuccess = move_uploaded_file($uploadedImage['tmp_name'], $dst);
 
+    
     if ($uploadSuccess) {
         echo "<img class='uploaded-image' src='{$uploadPath}{$image_name}' alt='Uploaded Image'>";
     } else {

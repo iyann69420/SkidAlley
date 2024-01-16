@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $order_id = isset($_POST['order_id']) ? validateInput($_POST['order_id']) : '';
         $stars = isset($_POST['stars']) ? intval($_POST['stars']) : 0;
         $review_text = isset($_POST['review']) ? validateInput($_POST['review']) : '';
+        $product_id = isset($_POST['product']) ? validateInput($_POST['product']) : '';
 
         // Check if the required fields are not empty
         if (!empty($order_id) && !empty($stars) && !empty($review_text)) {
@@ -39,9 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Insert the review data into the database
-            $insertQuery = "INSERT INTO reviews (order_id, client_id, image_path, stars, review_text) VALUES ('$order_id', '$client_id', '$image_name', '$stars', '$review_text')";
+            $insertQuery = "INSERT INTO reviews (order_id, product_id, client_id, image_path, stars, review_text) VALUES ('$order_id', '$product_id', '$client_id', '$image_name', '$stars', '$review_text')";
 
             $insertResult = mysqli_query($conn, $insertQuery);
+
+            $notificationQuery = "INSERT INTO admin_notifications (order_id, notification_type, is_approved, is_read) VALUES ('$order_id', 'Review Submitted', 4, 0)";
+             mysqli_query($conn, $notificationQuery);
+
 
             if ($insertResult) {
                 // Set a session variable to indicate that the review was submitted successfully
@@ -63,4 +68,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Close the database connection
 mysqli_close($conn);
+
 ?>

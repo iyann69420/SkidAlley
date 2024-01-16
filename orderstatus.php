@@ -1,4 +1,4 @@
-        <?php
+<?php
         $gcashReceiptUploaded = isset($_SESSION['gcashReceiptUploaded']) && $_SESSION['gcashReceiptUploaded'];
         include('partials-front/menu.php');
 
@@ -69,7 +69,7 @@
         if (isset($_SESSION['userLoggedIn']) && $_SESSION['userLoggedIn']) {
             $client_id = $_SESSION['client_id'];
 
-            $sql = "SELECT * FROM order_list WHERE client_id = $client_id";
+            $sql = "SELECT * FROM order_list WHERE client_id = $client_id ORDER BY date_created DESC";
             $res = mysqli_query($conn, $sql);
             $count = mysqli_num_rows($res);
 
@@ -88,10 +88,10 @@
                     
                     $statusText = [
                         0 => 'Pending',
-                        1 => 'Packed',
+                        1 => ($paymentMethod === 'Pickup') ? 'Preparing': 'Packed',
                         2 => 'For Delivery',
-                        3 => 'On the Way',
-                         4 => ($paymentMethod === 'Pickup') ? 'Pickup' : 'Delivered',
+                        3 => ($paymentMethod === 'Pickup') ? 'Ready to Pickup':'On the Way',
+                        4 => ($paymentMethod === 'Pickup') ? 'Pickup' : 'Delivered',
                         5 => 'Cancelled',
                         
                     ];
@@ -121,7 +121,7 @@
                                                 $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
                                                 break;
 
-                                            case 'Packed':
+                                            case ($paymentMethod === 'Pickup') ? 'Preparing': 'Packed':
                                                 $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
                                                 break;
 
@@ -129,13 +129,13 @@
                                                 $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
                                                 break;
 
-                                            case 'On the Way':
+                                            case ($paymentMethod === 'Pickup') ? 'Ready to Pickup':'On the Way':
                                                 $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +3 days'));
                                                 break;
 
-                                            case 'Delivered':
+                                            case ($paymentMethod === 'Pickup') ? 'Pickup' : 'Delivered':
                                                 // Customize as needed for the Delivered status
-                                                $deliveryDate = date('Y-m-d', strtotime($date_ordered . ' +1 day'));
+                                                $deliveryDate = 'N/A';
                                                 break;
 
                                             case 'Cancelled':
@@ -179,17 +179,21 @@
                                     <div class="track">
                                         <?php
                                         // Define the mapping of status values to text labels and icons
-                                        $statusData = [
-                                            0 => ['text' => 'Pending', 'icon' => 'fa-hourglass-half'],
-                                            1 => ['text' => 'Packed', 'icon' => 'fa-archive'],
-                                            2 => ['text' => 'For Delivery', 'icon' => 'fa-user'],
-                                            3 => ['text' => 'On the Way', 'icon' => 'fa-truck'],
-                                            4 => [
-                                                'text' => ($paymentMethod === 'Pickup') ? 'Pickup' : 'Delivered',
-                                                'icon' => 'fa-check'
-                                            ],
-                                        ];
-                                        
+                                      $statusData = [
+                                    0 => ['text' => 'Pending', 'icon' => 'fa-hourglass-half'],
+                                    1 => ['text' => ($paymentMethod === 'Pickup') ? 'Preparing':'Packed', 
+                                        'icon' => 'fa-archive'],
+                                    2 => ['text' => 'For Delivery', 'icon' => 'fa-user'],
+                                    3 => [
+                                        'text' => ($paymentMethod === 'Pickup') ? 'Ready to Pickup' : 'On the Way',
+                                        'icon' => 'fa-truck'
+                                    ],
+                                    4 => [
+                                        'text' => ($paymentMethod === 'Pickup') ? 'Pickup' : 'Delivered',
+                                        'icon' => 'fa-check'
+                                    ],
+                                ];
+
 
                                         // Get the status value from your database, assuming it's stored in $status
                                         $statusFromDatabase = $row['status']; // You need to fetch the status from your database here.
@@ -338,7 +342,8 @@
                                             } else {
                                                 echo "Error querying the database: " . mysqli_error($conn);
                                             }
-                                }
+                                     }
+                                   
 
                                     } else {
                                         echo $formButton;

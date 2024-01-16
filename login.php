@@ -29,6 +29,9 @@
                 echo $_SESSION['login'];
                 unset($_SESSION['login']);
             }
+
+
+            
             ?>
             <form action="" method="POST" name="login">
                 <div class="loginimage">

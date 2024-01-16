@@ -1,4 +1,8 @@
-<?php include('partials/menu.php'); ?>
+<?php include('partials/menu.php');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+?>
 
 <style>
     .modal {
@@ -48,7 +52,9 @@
         $userId = isset($_SESSION['client_id']) ? $_SESSION['client_id'] : null;
 
         $id = $_GET['id'];
-        $sql = "SELECT * FROM order_list WHERE id = $id";
+        $sql = "SELECT ol.*, cl.fullname AS client_name FROM order_list ol
+        INNER JOIN client_list cl ON ol.client_id = cl.id
+        WHERE ol.id = $id";
         $res = mysqli_query($conn, $sql);
 
         if ($res == true) {
@@ -62,6 +68,7 @@
                 $status = $row['status'];
                 $order_receive = $row['order_receive'];
                 $message = $row['message'];
+                $client_name = $row['client_name'];
                 
             } else {
                 header('location:' . SITEURL . 'admin/orders.php');
@@ -162,12 +169,12 @@
 
         <br/><br/><br/>
 
-        <form action="" method="POST">
+        <form action="" method="POST" onsubmit="return validateStatusChange();">
             <table class="tbl-30">
                 
                 <tr>
                     <td>Client Name: </td>
-                    <td><?php echo $client_id; ?></td>
+                    <td><?php echo $client_name;?></td>
                 </tr>
 
                 <tr>
@@ -224,6 +231,9 @@
             } else {
                 echo 'Pending upload';
             }
+
+            // Initialize $approved if it's not set
+            $approved = isset($approved) ? $approved : 0;
             ?>
         </td>
     </tr>
@@ -245,24 +255,34 @@
                 </tr>
 
                 <tr>
-                <td>Status: </td>
-                <td>
-                    <?php if ($paymentMethod !== 'Gcash' || ($paymentMethod === 'Gcash' && $approved == 1)): ?>
-                        <select name="status" <?php echo ($order_receive == 1) ? 'disabled' : ''; ?>>
-                            <option value="0" <?php if ($status == 0) echo 'selected'; ?>>Pending</option>
-                            <option value="1" <?php if ($status == 1) echo 'selected'; ?>>Packed</option>
-                            <option value="2" <?php if ($status == 2) echo 'selected'; ?>>For Delivery</option>
-                            <option value="3" <?php if ($status == 3) echo 'selected'; ?>>On the Way</option>
-                            <option value="4" <?php if ($status == 4) echo 'selected'; ?>>Delivered</option>
-                            <option value="5" <?php if ($status == 5) echo 'selected'; ?>>Cancelled</option>
-                        </select>
-                    <?php else: ?>
-                        <select name="status" disabled>
-                            <option value="0" selected>Pending (Locked)</option>
-                        </select>
-                    <?php endif; ?>
-                </td>
-            </tr>
+        <td>Status: </td>
+        <td>
+            <?php if ($paymentMethod !== 'Gcash' || ($paymentMethod === 'Gcash' && $approved == 1)): ?>
+                <select name="status" <?php echo ($order_receive == 1) ? 'disabled' : ''; ?>>
+                    <option value="0" <?php if ($status == 0) echo 'selected'; ?>>Pending</option>
+                    <option value="1" <?php if ($status == 1) echo 'selected'; ?>>Packed</option>
+                    <option value="2" <?php if ($status == 2) echo 'selected'; ?>>For Delivery</option>
+                    <option value="3" <?php if ($status == 3) echo 'selected'; ?>>On the Way</option>
+                    <option value="4" <?php if ($status == 4) echo 'selected'; ?>>Delivered</option>
+                    <option value="5" <?php if ($status == 5) echo 'selected'; ?>>Cancelled</option>
+                </select>
+                <!-- Add hidden input for status when dropdown is disabled -->
+                <input type="hidden" name="hidden_status" value="<?php echo $status; ?>">
+                <?php if ($status == 4): ?>
+                <br>
+                Order Received: 
+                <input type="radio" name="order_receive" value="1" <?php if ($order_receive == 1) echo 'checked'; ?>> Yes 
+                <input type="radio" name="order_receive" value="0" <?php if ($order_receive == 0) echo 'checked'; ?>> No 
+            <?php endif; ?>
+        <?php else: ?>
+            <select name="status" disabled>
+                <option value="0" selected>Pending (Locked)</option>
+            </select>
+            <!-- Add hidden input for status when dropdown is disabled -->
+            <input type="hidden" name="hidden_status" value="<?php echo $status; ?>">
+        <?php endif; ?>
+        </td>
+    </tr>
             </table>
 
             <table class="tbl-30">
@@ -309,16 +329,45 @@
             </table>
 
             <input type="submit" name="submit" value="Update Status" class="btn-secondary">
-
+      
         </form>
-
         <?php
-        // Check if the form is submitted
-        if (isset($_POST['submit'])) {
-            $newStatus = $_POST['status'];
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
+    $newStatus = filter_input(INPUT_POST, 'status', FILTER_VALIDATE_INT);
+    $gcashReceiptId = filter_input(INPUT_POST, 'gcash_receipt_id', FILTER_VALIDATE_INT);
 
-            $updateSql = "UPDATE order_list SET status = $newStatus WHERE id = $id";
-            $updateRes = mysqli_query($conn, $updateSql);
+    $order_receive = isset($_POST['order_receive']) ? $_POST['order_receive'] : 0;
+
+     
+    // Check if $newStatus is set and not empty
+    if ($newStatus !== false && $gcashReceiptId !== false) {
+        // Use prepared statements for updating the order status
+        $updateSql = "UPDATE order_list SET status = ?, order_receive = ? WHERE id = ? AND client_id = ?";
+
+
+        // Check if the payment method is 'Gcash' and $approved is 1
+        if ($paymentMethod === 'Gcash' && $approved == 1) {
+            $updateSql .= " AND status != 5"; // Add condition to prevent updating status for 'Cancelled' orders
+        }
+
+        // Use prepared statements to bind parameters
+        $stmt = mysqli_prepare($conn, $updateSql);
+        $selectSql = "SELECT * FROM order_list WHERE id = $id AND client_id = $userId";
+$selectResult = mysqli_query($conn, $selectSql);
+
+if ($selectResult) {
+    $row = mysqli_fetch_assoc($selectResult);
+    print_r($row); // Check the updated row
+} else {
+    echo "Select Failed: " . mysqli_error($conn);
+}
+
+        // Check if the prepared statement is successful
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "iiii", $newStatus, $order_receive, $id, $userId);
+
+            $updateRes = mysqli_stmt_execute($stmt);
 
             if ($updateRes) {
                 $_SESSION['add'] = "Status updated successfully.";
@@ -343,7 +392,7 @@
                     $promoId = 0; // Replace this with the actual promo ID if applicable
 
                     $insertNotificationSql = "INSERT INTO notifications (user_id, message, notification_type, timestamp, status, is_read, promo_id) 
-                                              VALUES ($userId, '$notificationMessage', '$notificationType', '$timestamp', '$status', $isRead, $promoId)";
+                                            VALUES ($userId, '$notificationMessage', '$notificationType', '$timestamp', '$status', $isRead, $promoId)";
 
                     mysqli_query($conn, $insertNotificationSql);
                 }
@@ -351,46 +400,93 @@
                 // If the new status is 'Cancelled' (status code 5)
                 if ($newStatus == 5) {
                     // Get the products from the canceled order
-                    $getProductsSql = "SELECT * FROM order_products WHERE order_id = $id";
-                    $productsResult = mysqli_query($conn, $getProductsSql);
+                    $getProductsSql = "SELECT * FROM order_products WHERE order_id = ?";
+                    $productsStmt = mysqli_prepare($conn, $getProductsSql);
 
-                    while ($product = mysqli_fetch_assoc($productsResult)) {
-                        $productId = $product['product_id'];
-                        $productQuantity = $product['quantity'];
+                    if ($productsStmt) {
+                        mysqli_stmt_bind_param($productsStmt, "i", $id);
+                        mysqli_stmt_execute($productsStmt);
 
-                        // Update the quantity in the stock_list table
-                        $updateStockSql = "UPDATE stock_list SET quantity = quantity + $productQuantity WHERE product_id = $productId";
-                        mysqli_query($conn, $updateStockSql);
+                        $productsResult = mysqli_stmt_get_result($productsStmt);
+
+                        while ($product = mysqli_fetch_assoc($productsResult)) {
+                            $productId = $product['product_id'];
+                            $productQuantity = $product['quantity'];
+
+                            // Update the quantity in the stock_list table
+                            $updateStockSql = "UPDATE stock_list SET quantity = quantity + ? WHERE product_id = ?";
+                            $updateStockStmt = mysqli_prepare($conn, $updateStockSql);
+
+                            if ($updateStockStmt) {
+                                mysqli_stmt_bind_param($updateStockStmt, "ii", $productQuantity, $productId);
+                                mysqli_stmt_execute($updateStockStmt);
+                                mysqli_stmt_close($updateStockStmt);
+                            }
+                        }
+
+                        mysqli_stmt_close($productsStmt);
                     }
+                $userId = isset($_SESSION['client_id']) ? $_SESSION['client_id'] : 0;
+                
+                $notificationMessage = "Your Order has been Canceled Successfully.";
+                $notificationType = "Cancellation";
+                $status = "new";
+                
+                // Set the Manila timezone
+                date_default_timezone_set('Asia/Manila');
+                
+                $timestamp = date('Y-m-d H:i:s', strtotime('now'));
+                $isRead = 0;
+                $promoId = 0; // Replace this with the actual promo ID if applicable
+                
+                $insertNotificationSql = "INSERT INTO notifications (user_id, message, notification_type, timestamp, status, is_read, promo_id) 
+                                          VALUES ('$userId', '$notificationMessage', '$notificationType', '$timestamp', '$status', '$isRead', '$promoId')";
+                
+                if (mysqli_query($conn, $insertNotificationSql)) {
+                    echo "Record inserted successfully";
+                } else {
+                    echo "Error inserting record: " . mysqli_error($conn);
+                }
+                
 
-                    $userId = isset($_SESSION['client_id']) ? $_SESSION['client_id'] : null;
 
-                    $notificationMessage = "Your order has been canceled successfully.";
-                    $notificationType = "Cancellation";
-                    $timestamp = date('Y-m-d H:i:s');
-                    $status = "new";
-                    $isRead = 0;
-                    $promoId = 0; // Replace this with the actual promo ID if applicable
-
-                    $insertNotificationSql = "INSERT INTO notifications (user_id, message, notification_type, timestamp, status, is_read, promo_id) 
-                                            VALUES ($userId, '$notificationMessage', '$notificationType', '$timestamp', '$status', $isRead, $promoId)";
-
-                    mysqli_query($conn, $insertNotificationSql);
 
                     // Redirect to the desired page after canceling the order
                     header('location: ' . SITEURL . 'admin/orders.php');
+                    exit(); // Ensure no further code execution after the redirect
                 } else {
                     // Redirect to the desired page if the status is not 'Cancelled'
                     header('location: ' . SITEURL . 'admin/orders.php');
+                    exit(); // Ensure no further code execution after the redirect
                 }
             } else {
                 $_SESSION['add'] = "Failed to update status.";
                 header('location: ' . SITEURL . 'admin/orders.php');
+                exit(); // Ensure no further code execution after the redirect
             }
+
+            // Close the prepared statement
+            mysqli_stmt_close($stmt);
+        } else {
+            // Handle the case where the prepared statement fails
+            $_SESSION['add'] = "Failed to update status.";
+            header('location: ' . SITEURL . 'admin/orders.php');
+            exit(); // Ensure no further code execution after the redirect
         }
-        ?>
+    } else {
+        $_SESSION['add'] = "Invalid status or Gcash receipt ID.";
+        header('location: ' . SITEURL . 'admin/orders.php');
+        exit(); // Ensure no further code execution after the redirect
+    }
+}
+?>
+
+
     </div>
 </div>
+<?php
+
+?>
 
 <?php include('partials/footer.php'); ?>
 

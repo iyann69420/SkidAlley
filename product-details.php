@@ -58,6 +58,11 @@
     margin-top: 150px; /* Adjust this margin to move timestamp below */
   }
 
+  .reply-text{
+    text-align: left;
+   
+  }
+
   .color-size {
     text-align: center; /* Center content horizontally within .color-size */
     margin-top: 20px;
@@ -136,11 +141,24 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
 
 
     $currentTime = date('Y-m-d H:i:s');
-    $sql = "SELECT pl.*, sl.quantity AS stock_quantity, d.discount_percentage
-            FROM product_list pl 
-            LEFT JOIN stock_list sl ON pl.id = sl.product_id 
-            LEFT JOIN discounts d ON pl.id = d.product_id AND (d.end_time IS NULL OR d.end_time >= '$currentTime')
-            WHERE pl.id = $product_id";
+    $sql = "SELECT 
+    pl.*, 
+    sl.quantity AS stock_quantity, 
+    d.discount_percentage,
+    AVG(r.stars) AS average_stars,
+    COALESCE(SUM(op.quantity), 0) AS total_sold
+FROM 
+    product_list pl
+    LEFT JOIN stock_list sl ON pl.id = sl.product_id
+    LEFT JOIN discounts d ON pl.id = d.product_id AND (d.end_time IS NULL OR d.end_time >= '$currentTime')
+    LEFT JOIN order_products op ON pl.id = op.product_id
+    LEFT JOIN order_list ol ON op.order_id = ol.id
+    LEFT JOIN reviews r ON ol.id = r.order_id
+WHERE 
+    pl.id = $product_id
+GROUP BY 
+    pl.id, pl.name, pl.description, pl.image_path, pl.price, d.discount_percentage";
+
         $res = mysqli_query($conn, $sql);
         
     if ($res) 
@@ -184,6 +202,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id']))
                     } else {
                         echo "<p class='final'>Price: ₱" . number_format($originalPrice) . "</p>";
                     }
+                    
                     ?> 
                 </div>
 
@@ -523,6 +542,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         reviews.review_text,
         reviews.image_path,
         reviews.timestamp,
+        reviews.reply,
         order_list.id AS order_list_id,
         order_products.product_id,
         product_list.name AS product_name,
@@ -537,7 +557,8 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     JOIN 
         product_list ON order_products.product_id = product_list.id
     WHERE
-        product_list.id = $product_id";
+        product_list.id = $product_id
+        AND reviews.approved = 1";
 
     // Apply star filter
     if ($starFilter > 0) {
@@ -555,6 +576,23 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $reviews_sql .= " ORDER BY reviews.timestamp $sortOrder";
 
     $reviews_res = mysqli_query($conn, $reviews_sql);
+      $totalStars = 0;
+        $totalReviews = 0;
+
+        // Sum up stars from each review
+        while ($review = mysqli_fetch_assoc($reviews_res)) {
+            $totalStars += $review['stars'];
+            $totalReviews++;
+        }
+
+        // Calculate the overall rating as a percentage
+        $overallRating = $totalReviews > 0 ? round($totalStars / $totalReviews, 1) : 0;
+
+        // Display the overall rating
+        echo "<h2>Overall Rating: $overallRating</h2>";
+
+        // Reset the result set
+        mysqli_data_seek($reviews_res, 0);
 
     if ($reviews_res) {
         if (mysqli_num_rows($reviews_res) > 0) {
@@ -567,6 +605,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                 $product_id = $review["product_id"];
                 $product_name = $review["product_name"];
                 $client_id = $review["client_id"];
+                $reply = $review["reply"];
 
                 // Fetch client details from client_list based on client_id
                 $client_query = "SELECT username FROM client_list WHERE id = $client_id";
@@ -611,6 +650,11 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
                         <!-- Timestamp Section -->
                         <p class="timestamp">Posted on: <?php echo $timestamp; ?></p>
+
+                         <div class="reply-text" style="font-weight: bold;">
+                            <p>Reply:</p>
+                            <p><?php echo $reply; ?></p>
+                        </div>
                     </div>
 
                     <!-- Image Section -->
@@ -629,6 +673,9 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
                         <p>Colors: <?php echo $color ?></p>
                         <p>Size: <?php echo $size ?></p>
                     </div>
+
+                   
+
                 </div>
                 <?php
 
@@ -821,6 +868,7 @@ if ($client_id > 0) {
 ?>
     </div>
 </div>
+
 
 <?php
 include('partials-front/footer.php');

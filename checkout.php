@@ -19,6 +19,19 @@ $deliveryOption = '';
     #orderSummary div {
     margin-bottom: 10px;
 }
+    .edit-address-container button {
+        background-color: black;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .edit-address-container button:hover {
+        background-color: orange;
+    }
 </style>
 
 <br><br>
@@ -69,7 +82,10 @@ $deliveryOption = '';
                 ?>
                 <p><strong>Name:</strong> <?php echo $fullname; ?></p>
                 <p><strong>Contact Number:</strong> <?php echo $contact; ?></p>
-                <p><strong>Address:</strong> <?php echo $address; ?></p>
+                <div class="edit-address-container">
+                    <label><strong>Address:</strong> <?php echo $address; ?></label>
+                    <button type="button" onclick="editDeliveryAddress()">Edit Address</button>
+                </div>
             </div>
 
             <table class="purchase-order">
@@ -143,6 +159,7 @@ $deliveryOption = '';
             </table>
 
 
+
             <div class="order-message">
                 <label for="order_message">Message:</label>
                 <textarea name="order_message" id="order_message" rows="4" cols="50"></textarea>
@@ -212,6 +229,26 @@ $deliveryOption = '';
 </body>
 
 <script>
+ function editDeliveryAddress() {
+        alertify.prompt('Edit Delivery Address', 'Enter new address:', ''
+            , function (evt, value) {
+                // User clicked "OK"
+                if (value.trim() !== '') {
+                    // Update the displayed delivery address
+                    document.querySelector('.edit-address-container label').innerHTML = `<strong>Address:</strong> ${value}`;
+
+                    // Update the JavaScript object with the new address
+                    deliveryAddress.address = value;
+
+                    // Perform any additional actions if needed
+                }
+            }
+            , function () {
+                // User clicked "Cancel"
+            }
+        );
+    }
+
 
 
     
@@ -234,6 +271,23 @@ $deliveryOption = '';
         paymentButtons.style.display = 'none';
     }
 
+    function updateDeliveryAddress() {
+    const newDeliveryAddressInput = document.getElementById('new_delivery_address');
+    const deliveryAddressParagraph = document.querySelector('.delivery-address p:last-child');
+
+    if (newDeliveryAddressInput.value.trim() !== '') {
+        // Update the displayed delivery address
+        deliveryAddressParagraph.innerHTML = `<strong>Address:</strong> ${newDeliveryAddressInput.value}`;
+
+        // Update the JavaScript object with the new address
+        deliveryAddress.address = newDeliveryAddressInput.value;
+
+        // Clear the input field
+        newDeliveryAddressInput.value = '';
+    }
+}
+
+
     function showPaymentDetails(paymentMethod) {
     const paymentDetails = document.querySelector('.payment-details');
     const paymentMethodInput = document.querySelector('input[name="payment_method"]');
@@ -241,9 +295,13 @@ $deliveryOption = '';
     const orderMessageTextarea = document.querySelector('textarea[name="order_message"]');
     const additionalFee = 300; // Additional fee for Cash on Delivery
 
+    // Check if a voucher is selected
+    const selectedVoucher = document.querySelector('input[name="selected_voucher"]:checked');
+    let voucherAmount = 0;
 
-  
-
+    if (selectedVoucher) {
+        voucherAmount = parseFloat(selectedVoucher.parentNode.querySelector('.voucher-amount').innerText.replace('₱', ''));
+    }
 
     if (paymentMethodInput) {
         let totalWithFee = <?php echo $totalPrice; ?>; // Initial total without fee
@@ -270,6 +328,9 @@ $deliveryOption = '';
             totalWithFee += additionalFee; // Add the additional fee for COD
         }
 
+        // Deduct the voucher amount from the total
+        totalWithFee -= voucherAmount;
+
         const formattedTotalWithFee = new Intl.NumberFormat('en-PH', {
             style: 'currency',
             currency: 'PHP'
@@ -287,11 +348,10 @@ $deliveryOption = '';
             <div><strong>Contact Number:</strong> ${deliveryAddress.contact}</div>
             <div><strong>Address:</strong> ${deliveryAddress.address}</div>
             ${paymentMethod === 'Cash on Delivery' ? `<div><strong>Additional Fee (Shipping):</strong> ₱${additionalFee}</div>` : ''}
+            ${voucherAmount > 0 ? `<div><strong>Discount (Voucher):</strong> -₱${voucherAmount}</div>` : ''}
             <div><strong>Total Price:</strong> ${formattedTotalWithFee}</div>
             ${paymentMethod === 'Gcash' ? `<div><em>Please note: Payment will be done upon checkout.</em></div>` : ''}
         `;
-
-
 
         hidePaymentButtons();
 
@@ -300,6 +360,7 @@ $deliveryOption = '';
         document.querySelector('input[name="checkout"]').disabled = false;
     }
 }
+
 
 
 
@@ -329,53 +390,71 @@ function createVoucher($userId) {
         if ($purchaseHistoryResult) {
             $totalOrders = mysqli_fetch_assoc($purchaseHistoryResult)['total_orders'];
 
-            // Check if the user has made 3 or more purchases
+            //  
             if ($totalOrders >= 2 && $totalOrders < 6) {
-                // Generate a voucher code (you may use any logic to create a unique code)
-                $voucherCode = generateVoucherCode();
+                // Check if the user already has a voucher with the same amount
+                $existingVoucherAmountSql = "SELECT * FROM vouchers WHERE client_id = ? AND amount = 200  AND expiration_date >= CURDATE()";
+                $existingVoucherAmountStmt = mysqli_prepare($conn, $existingVoucherAmountSql);
+                mysqli_stmt_bind_param($existingVoucherAmountStmt, "i", $userId);
+                mysqli_stmt_execute($existingVoucherAmountStmt);
+                $existingVoucherAmountResult = mysqli_stmt_get_result($existingVoucherAmountStmt);
 
-                // Set voucher amount to 200
-                $voucherAmount = 200;
+                if (!$existingVoucherAmountResult || mysqli_num_rows($existingVoucherAmountResult) == 0) {
+                    // Generate a voucher code (you may use any logic to create a unique code)
+                    $voucherCode = generateVoucherCode();
 
-                // Set expiration date to 7 days from now
-                $expirationDate = date('Y-m-d', strtotime('+7 days'));
+                    // Set voucher amount to 200
+                    $voucherAmount = 200;
 
-                // Insert voucher into the vouchers table
-                $insertVoucherSql = "INSERT INTO vouchers (code, client_id, amount, expiration_date) 
-                                     VALUES (?, ?, ?, ?)";
-                $insertVoucherStmt = mysqli_prepare($conn, $insertVoucherSql);
-                mysqli_stmt_bind_param($insertVoucherStmt, "sids", $voucherCode, $userId, $voucherAmount, $expirationDate);
-                mysqli_stmt_execute($insertVoucherStmt);
+                    // Set expiration date to 7 days from now
+                    $expirationDate = date('Y-m-d', strtotime('+7 days'));
 
-                // Return the voucher details (you may modify this based on your needs)
-                return [
-                    'code' => $voucherCode,
-                    'amount' => $voucherAmount,
-                    'expiration_date' => $expirationDate
-                ];
+                    // Insert voucher into the vouchers table
+                    $insertVoucherSql = "INSERT INTO vouchers (code, client_id, amount, expiration_date) 
+                                         VALUES (?, ?, ?, ?)";
+                    $insertVoucherStmt = mysqli_prepare($conn, $insertVoucherSql);
+                    mysqli_stmt_bind_param($insertVoucherStmt, "sids", $voucherCode, $userId, $voucherAmount, $expirationDate);
+                    mysqli_stmt_execute($insertVoucherStmt);
+
+                    // Return the voucher details (you may modify this based on your needs)
+                    return [
+                        'code' => $voucherCode,
+                        'amount' => $voucherAmount,
+                        'expiration_date' => $expirationDate
+                    ];
+                }
             } elseif ($totalOrders >= 5) {
-                // Generate a voucher code (you may use any logic to create a unique code)
-                $voucherCode = generateVoucherCode();
+                // Check if the user already has a voucher with the same amount
+                $existingVoucherAmountSql = "SELECT * FROM vouchers WHERE client_id = ? AND amount = 400  AND expiration_date >= CURDATE()";
+                $existingVoucherAmountStmt = mysqli_prepare($conn, $existingVoucherAmountSql);
+                mysqli_stmt_bind_param($existingVoucherAmountStmt, "i", $userId);
+                mysqli_stmt_execute($existingVoucherAmountStmt);
+                $existingVoucherAmountResult = mysqli_stmt_get_result($existingVoucherAmountStmt);
 
-                // Set voucher amount to 400
-                $voucherAmount = 400;
+                if (!$existingVoucherAmountResult || mysqli_num_rows($existingVoucherAmountResult) == 0) {
+                    // Generate a voucher code (you may use any logic to create a unique code)
+                    $voucherCode = generateVoucherCode();
 
-                // Set expiration date to 7 days from now
-                $expirationDate = date('Y-m-d', strtotime('+7 days'));
+                    // Set voucher amount to 400
+                    $voucherAmount = 400;
 
-                // Insert voucher into the vouchers table
-                $insertVoucherSql = "INSERT INTO vouchers (code, client_id, amount, expiration_date) 
-                                     VALUES (?, ?, ?, ?)";
-                $insertVoucherStmt = mysqli_prepare($conn, $insertVoucherSql);
-                mysqli_stmt_bind_param($insertVoucherStmt, "sids", $voucherCode, $userId, $voucherAmount, $expirationDate);
-                mysqli_stmt_execute($insertVoucherStmt);
+                    // Set expiration date to 7 days from now
+                    $expirationDate = date('Y-m-d', strtotime('+7 days'));
 
-                // Return the voucher details (you may modify this based on your needs)
-                return [
-                    'code' => $voucherCode,
-                    'amount' => $voucherAmount,
-                    'expiration_date' => $expirationDate
-                ];
+                    // Insert voucher into the vouchers table
+                    $insertVoucherSql = "INSERT INTO vouchers (code, client_id, amount, expiration_date) 
+                                         VALUES (?, ?, ?, ?)";
+                    $insertVoucherStmt = mysqli_prepare($conn, $insertVoucherSql);
+                    mysqli_stmt_bind_param($insertVoucherStmt, "sids", $voucherCode, $userId, $voucherAmount, $expirationDate);
+                    mysqli_stmt_execute($insertVoucherStmt);
+
+                    // Return the voucher details (you may modify this based on your needs)
+                    return [
+                        'code' => $voucherCode,
+                        'amount' => $voucherAmount,
+                        'expiration_date' => $expirationDate
+                    ];
+                }
             }
         }
     }
@@ -432,9 +511,9 @@ if (isset($_POST['checkout'])) {
     }
 
   
-
-    $insertOrderSql = "INSERT INTO order_list (ref_code, client_id, total_amount, delivery_address, payment_method, message, status, order_receive)
-    VALUES ('$refCode', $userId, $totalPrice, '$deliveryAddress', '$paymentMethod', '$orderMessage', 0, 0)";
+    $timenow = date('Y-m-d H:i:s');
+    $insertOrderSql = "INSERT INTO order_list (ref_code, client_id, total_amount, delivery_address, payment_method, message, status, order_receive, date_created)
+    VALUES ('$refCode', $userId, $totalPrice, '$deliveryAddress', '$paymentMethod', '$orderMessage', 0, 0, '$timenow')";
 
         $createdVoucher = createVoucher($userId);   
         if ($createdVoucher) {

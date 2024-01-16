@@ -55,16 +55,18 @@
                 </tr>
 
                 <tr>
-                    <td>Status:</td>
-                        <td>
-                            <input <?php if ($status == 1) { echo "checked"; } ?> type="radio" name="status" value="1"> Active
-                            <input <?php if ($status == 0) { echo "checked"; } ?> type="radio" name="status" value="0"> Inactive
-                        </td>
+                    <td>Approved:</td>
+                    <td>
+                        <input <?php if ($approved == 1) { echo "checked"; } ?> type="radio" name="approved" value="1"> Yes
+                        <input <?php if ($approved == 0) { echo "checked"; } ?> type="radio" name="approved" value="0"> No
+                    </td>
                 </tr>
+
+
 
                 <tr>
                     <td colspan="2">
-                        <input type="submit" name="submit" value="Update Category" class="btn-secondary">
+                        <input type="submit" name="submit" value="Update Review" class="btn-secondary">
                         <input type="hidden" name="id" value="<?php echo $id; ?>">
                     </td>
                 </tr>
@@ -77,13 +79,15 @@
             $id = $_POST['id'];
             $title = $_POST['title'];
             $description = $_POST['description'];
-            $status = isset($_POST['status']) ? $_POST['status'] : 'No';
+            $approved = isset($_POST['approved']) ? $_POST['approved'] : 0;
+
 
             $sql2 = "UPDATE service_list SET
-                    service = '$title',
-                    description = '$description',
-                    status = '$status'
-                    WHERE id=$id";
+                        service = '$title',
+                        description = '$description',
+                        status = '$approved'
+                        WHERE id=$id";
+
 
             $res2 = mysqli_query($conn, $sql2);
             

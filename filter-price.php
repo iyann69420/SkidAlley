@@ -44,6 +44,16 @@
         text-align: center;
         margin-bottom: 20px;
         font-size: 28px;
+}   
+.average-stars,
+.total-sold {
+display: inline-block;
+margin-right: 10px; /* Adjust the margin as needed */
+}
+
+.average-stars {
+font-size: 18px;
+color: gold; /* Star color */
     }
 </style>
 
@@ -54,7 +64,6 @@ include('partials-front/menu.php');
 ?>
 <br><br><br><br>
 <?php
-
 
 // Function to get discount percentage for a product
 function getDiscountPercentage($conn, $productId) {
@@ -85,7 +94,33 @@ function calculateDiscountedPrice($price, $discountPercentage) {
     return max($discountedPrice, 0);
 }
 
-// Assuming you have a database connection established
+// Function to get average stars and total sold for a product
+function getProductStats($conn, $productId) {
+    $sql = "SELECT AVG(r.stars) AS average_stars, COALESCE(SUM(op.quantity), 0) AS total_sold
+            FROM product_list pl
+            LEFT JOIN order_products op ON pl.id = op.product_id
+            LEFT JOIN order_list ol ON op.order_id = ol.id
+            LEFT JOIN reviews r ON ol.id = r.order_id
+            WHERE pl.id = $productId
+            AND ol.status = 4";
+
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return [
+            'average_stars' => $row['average_stars'],
+            'total_sold' => $row['total_sold']
+        ];
+    }
+
+    // Return default values if no data found
+    return [
+        'average_stars' => 0,
+        'total_sold' => 0
+    ];
+}
+
 if (isset($_GET['min-price']) && isset($_GET['max-price'])) {
     $minPrice = $_GET['min-price'];
     $maxPrice = $_GET['max-price'];
@@ -116,6 +151,7 @@ if (isset($_GET['min-price']) && isset($_GET['max-price'])) {
                 $discountPercentage = getDiscountPercentage($conn, $product['id']);
                 $price = $product['price'];
                 $discountedPrice = calculateDiscountedPrice($price, $discountPercentage);
+                $productStats = getProductStats($conn, $product['id']);
                 ?>
                 
                 <div class="filtered-product">
@@ -133,6 +169,21 @@ if (isset($_GET['min-price']) && isset($_GET['max-price'])) {
                             echo "<p class='price'>Price: ₱" . number_format($price) . "</p>";
                         }
                         ?>
+                        
+                        <p class='average-stars'>
+                            <?php
+                            $averageStars = round($productStats['average_stars'], 1);
+                            for ($i = 1; $i <= 5; $i++) {
+                                if ($i <= $averageStars) {
+                                    echo "★"; // Full star
+                                } else {
+                                    echo "☆"; // Empty star
+                                }
+                            }
+                            ?>
+                        </p>
+
+                        <p class='total-sold'><?= $productStats['total_sold'] ?> sold</p>
                     </a>
                 </div>
                 <?php
@@ -152,3 +203,4 @@ if (isset($_GET['min-price']) && isset($_GET['max-price'])) {
 <?php
 include('partials-front/footer.php');
 ?>
+

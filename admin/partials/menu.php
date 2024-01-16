@@ -57,9 +57,7 @@ include ('login-check.php');
                 Notifications
                 <span id="notificationCount" class="notification-count"></span>
             </a>
-                
-               
-            
+                            
         </div>
     </div>
 
@@ -101,12 +99,9 @@ include ('login-check.php');
                     <li><a href="categories.php">Categories</a></li>
                     <li><a href="colors-sizes.php">Colors And Sizes</a></li>
                     <li><a href="brands.php">Brands</a></li>
-                    <li><a href="services.php">Services</a></li>
-                    <li><a href="messages.php">Message</a></li>
                     <li><a href="discounts.php">Discounts</a></li>
                     <li><a href="vouchers.php">Vouchers</a></li>
                     <li><a href="clients.php">Client List</a></li>
-                    <li><a href="supplier.php">Supplier</a></li>
                 </ul>
             </li>
             <?php } ?>
@@ -114,6 +109,14 @@ include ('login-check.php');
 
             <?php if ($orders) { ?>
             <li><a href="orders.php">Orders</a></li>
+            <?php } ?>
+
+            <?php if ($orders) { ?>
+            <li><a href="reviews.php">Reviews</a></li>
+            <?php } ?>
+
+            <?php if ($admin) { ?>
+            <li><a href="sales-report.php">Sales Report</a></li>
             <?php } ?>
 
          
@@ -143,16 +146,19 @@ include ('login-check.php');
     <script>
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Toggle sidebar
-    document.getElementById('sidebarCollapse').addEventListener('click', function () {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('active');
+        
+        document.getElementById('sidebarCollapse').addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        });
+
+       
+        updateNotificationCount();
+
+      
+        setInterval(updateNotificationCount, 1000);
     });
-
-    // Update notification count
-    updateNotificationCount();
-});
-
+    
 function toggleSubMenu(element) {
             const subMenu = element.nextElementSibling;
             const arrow = element.querySelector(".arrow");
@@ -165,32 +171,31 @@ function toggleSubMenu(element) {
                 arrow.classList.add('rotate');
             }
         }
+        function updateNotificationCount() {
+        
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+               
+                var count = parseInt(this.responseText);
 
-function updateNotificationCount() {
-    // Make an AJAX call to fetch the notification count from the server
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            // Get the notification count from the response
-            var count = parseInt(this.responseText);
+               
+                var notificationCountElement = document.getElementById('notificationCount');
 
-            // Get the notification count element
-            var notificationCountElement = document.getElementById('notificationCount');
+                // Update the notification count in the HTML
+                notificationCountElement.textContent = count;
 
-            // Update the notification count in the HTML
-            notificationCountElement.textContent = count;
-
-            // Hide the notification count if the count is zero
-            if (count === 0) {
-                notificationCountElement.style.display = 'none';
-            } else {
-                notificationCountElement.style.display = 'block';
+                
+                if (count === 0) {
+                    notificationCountElement.style.display = 'none';
+                } else {
+                    notificationCountElement.style.display = 'block';
+                }
             }
-        }
-    };
-    xhr.open("GET", "get-notification-count.php", true);
-    xhr.send();
-}
+        };
+        xhr.open("GET", "get-notification-count.php", true);
+        xhr.send();
+    }
     </script>
 </body>
 </html>

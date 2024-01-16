@@ -8,6 +8,18 @@
     </form>
 </div>
 
+<style>
+    .average-stars,
+    .total-sold {
+        display: inline-block;
+        margin-right: 10px; /* Adjust the margin as needed */
+    }
+
+    .average-stars {
+        font-size: 18px;
+        color: gold; /* Star color */
+    }
+</style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
@@ -45,7 +57,47 @@
     </script>
     
 
+<?php
+function getProductStats($conn, $productId) {
+    $sql = "SELECT AVG(r.stars) AS average_stars, COALESCE(SUM(op.quantity), 0) AS total_sold
+            FROM product_list pl
+            LEFT JOIN order_products op ON pl.id = op.product_id
+            LEFT JOIN order_list ol ON op.order_id = ol.id
+            LEFT JOIN reviews r ON ol.id = r.order_id
+            WHERE pl.id = $productId
+            AND ol.status = 4";
 
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        return [
+            'average_stars' => $row['average_stars'],
+            'total_sold' => $row['total_sold']
+        ];
+    }
+
+    // Return default values if no data found
+    return [
+        'average_stars' => 0,
+        'total_sold' => 0
+    ];
+}
+
+function calculateStarRating($averageStars) {
+    $fullStars = floor($averageStars);
+    $halfStar = round($averageStars * 2) % 2 == 1;
+
+    $starRating = str_repeat("★", $fullStars);
+    if ($halfStar) {
+        $starRating .= "½";
+    }
+
+    return $starRating;
+}
+
+
+?>
 
 
     </div>
@@ -105,26 +157,27 @@
     <?php
     if (isset($_GET['search'])) {
         $search = $_GET['search'];
-
+    
         // Modify the query accordingly
         $query = "SELECT * FROM `product_list` WHERE `name` LIKE '%$search%' AND `status` = 1 AND `delete_flag` = 0";
         $result = mysqli_query($conn, $query);
-
+    
         if ($result) {
             $numRows = mysqli_num_rows($result);
-
+    
             if ($numRows > 0) {
                 echo '<h1> You Searched: "' . $search . '"</h1>';
                 echo '<br><br>';
-
+    
                 // Display search results
-                while ($row = mysqli_fetch_assoc($result)) 
-                {
+                while ($row = mysqli_fetch_assoc($result)) {
                     $id = $row['id'];
                     $title = $row['name'];
                     $description = $row['description'];
                     $price = $row['price'];
                     $image_name = $row['image_path'];
+                    $productStats = getProductStats($conn, $id);
+                    $starRating = calculateStarRating($productStats['average_stars']);
                     ?>
                     
                     <div class="bikelist">
@@ -132,18 +185,18 @@
                             <br>
                             <?php
                             // Display product image
-                            if ($image_name == "")
-                            {
+                            if ($image_name == "") {
                                 echo "<div class='error'>Image not Available</div>";
-                            } else 
-                            {
+                            } else {
                                 echo '<a href="product-details.php?id=' . $id . '">';
                                 echo '<img src="' . SITEURL . 'images/bike/' . $image_name . '" style="width: 300px">';
                                 echo '</a>';
                             }
                             ?>
                             <h2><?php echo $title; ?></h2>
-                            <p>PHP<?php echo $price;?></p>
+                            <p>PHP<?php echo $price; ?></p>
+                            <p class='average-stars'><?php echo $starRating; ?></p>
+                            <p class='total-sold'><?php echo $productStats['total_sold']; ?> sold</p>
                         </div>
                     </div>
                     <?php
@@ -152,7 +205,6 @@
                 echo '<h1> You Searched: "' . $search . '"</h1>';
                 echo '<br><br><br><br>';
                 echo '<div style="margin-left: 30px;"><span style="font-size: 24px;">No products found</span></div>';
-
             }
         } else {
             echo 'Error in executing the query.';

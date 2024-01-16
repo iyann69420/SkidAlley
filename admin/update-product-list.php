@@ -120,16 +120,22 @@
 
 
             $sql3 = "UPDATE product_list SET
-                name = '$title',
-                description = '$description',
-                brand_id = '$brand',
-                price = '$price',
-                image_path = '$image_name',
-                category_id = '$category',
-                status = '$active'
-                WHERE id = $id";
-
-            $res3 = mysqli_query($conn, $sql3);
+            name = ?,
+            description = ?,
+            brand_id = ?,
+            price = ?,
+            image_path = ?,
+            category_id = ?,
+            status = ?
+            WHERE id = ?";
+        
+        $stmt = mysqli_prepare($conn, $sql3);
+        
+        mysqli_stmt_bind_param($stmt, "sssssssi", $title, $description, $brand, $price, $image_name, $category, $active, $id);
+        
+        $res3 = mysqli_stmt_execute($stmt);
+        
+        mysqli_stmt_close($stmt);
 
             if($res3==true)
             {
